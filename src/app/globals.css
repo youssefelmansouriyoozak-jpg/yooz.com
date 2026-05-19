@@ -1,0 +1,144 @@
+/* Updated: 2025-12-25T12:49:02.084Z */
+/* Updated: 2025-12-24T13:56:00.324Z */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-background: #FFFFFF;
+  --color-foreground: #1D1D1B;
+
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1D1D1B;
+
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1D1D1B;
+
+  --color-primary: #501111;
+  --color-primary-foreground: #FFFFFF;
+
+  --color-secondary: #E6E6E6;
+  --color-secondary-foreground: #1D1D1B;
+
+  --color-muted: #F5F5F5;
+  --color-muted-foreground: #626262;
+
+  --color-accent: #501111;
+  --color-accent-foreground: #FFFFFF;
+
+  --color-destructive: #C1272D;
+  --color-destructive-foreground: #FFFFFF;
+
+  --color-border: #E6E6E6;
+  --color-input: #E6E6E6;
+  --color-ring: #501111;
+
+  --color-burgundy: #501111;
+  --color-deep-teal: #082424;
+  --color-gold: #9A771F;
+  --color-sale-red: #C1272D;
+  --color-section-light: #E6E6E6;
+
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Montserrat", sans-serif;
+
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+}
+
+@import "tailwindcss";
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: #E6E6E6;
+  }
+
+  :root {
+    --background: #FFFFFF;
+    --foreground: #1D1D1B;
+    --card: #FFFFFF;
+    --card-foreground: #1D1D1B;
+    --popover: #FFFFFF;
+    --popover-foreground: #1D1D1B;
+    --primary: #501111;
+    --primary-foreground: #FFFFFF;
+    --secondary: #E6E6E6;
+    --secondary-foreground: #1D1D1B;
+    --muted: #F5F5F5;
+    --muted-foreground: #626262;
+    --accent: #501111;
+    --accent-foreground: #FFFFFF;
+    --destructive: #C1272D;
+    --destructive-foreground: #FFFFFF;
+    --border: #E6E6E6;
+    --input: #E6E6E6;
+    --ring: #501111;
+    --radius: 0.75rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .font-serif-italic {
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 1200px;
+  }
+
+  .editorial-title {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.1;
+  }
+
+.brand-card-hover {
+      transition: transform 0.3s ease;
+    }
+    
+    .brand-card-hover:hover {
+      transform: scale(1.02);
+    }
+}
+
+@keyframes announcement-slide {
+  0%, 40% {
+    transform: translateY(0);
+  }
+  50%, 90% {
+    transform: translateY(-40px);
+  }
+  100% {
+    transform: translateY(-80px);
+  }
+}
+
+.animate-announcement-slide {
+  animation: announcement-slide 6s ease-in-out infinite;
+}
