@@ -345,7 +345,7 @@ export default function ProductPageClient({ product }: { product: any }) {
                 </div>
                 <div className="flex items-center gap-3">
                   <ArrowLeftRight size={16} className="text-primary" />
-                  <span className="text-xs text-foreground font-medium">Échange gratuit sous 7 jours</span>
+                  <span className="text-xs text-foreground font-medium">Échange sous 3 jours</span>
                 </div>
               </div>
             </div>
