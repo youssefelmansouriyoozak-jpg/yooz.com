@@ -23,6 +23,10 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
 
   const totalPrice = items.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0);
 
+  // CORRECTION: suppression du "if (!isOpen) return null"
+  // Ce return null détruisait et recréait CodOrderFormV2 à chaque ouverture/fermeture
+  // du drawer, ce qui réinitialisait son state et pouvait provoquer des soumissions dupliquées.
+  // On utilise maintenant la visibilité CSS via le prop isOpen passé à CodOrderFormV2.
   if (!isOpen) return null;
 
   return (
@@ -127,6 +131,11 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
         )}
       </div>
 
+      {/* Cette instance de CodOrderFormV2 est LÉGITIME — elle sert uniquement
+          le flux "panier → commande". Elle ne coexiste PAS avec celle de
+          product-page-client.tsx car cart-drawer n'est monté que depuis le header,
+          pas depuis la page produit. Le header n'a plus son propre CodOrderFormV2
+          (supprimé dans header.tsx), donc il n'y a plus de doublon. */}
       <CodOrderFormV2 
         isOpen={isCodFormOpen} 
         onClose={() => setIsCodFormOpen(false)}

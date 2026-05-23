@@ -20,13 +20,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import CodOrderFormV2 from '@/components/cod-order-form-v2';
+// SUPPRIMÉ: import CodOrderFormV2 from '@/components/cod-order-form-v2';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const Header = () => {
   const { cart, totalItems, removeFromCart, clearCart } = useCart();
-  const [isCodFormOpen, setIsCodFormOpen] = useState(false);
+  // SUPPRIMÉ: const [isCodFormOpen, setIsCodFormOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const pathname = usePathname();
@@ -335,8 +335,12 @@ const Header = () => {
                             </div>
                         </div>
 
+                        {/* CORRECTION: onClick ferme le Sheet header uniquement.
+                            Le CodOrderFormV2 est supprimé de ce fichier.
+                            Le formulaire COD est géré uniquement dans cart-drawer.tsx
+                            et product-page-client.tsx — plus de doublon pixel. */}
                         <Button 
-                          onClick={() => setIsCodFormOpen(true)}
+                          onClick={() => setIsCartOpen(false)}
                           className="w-full h-16 rounded-full bg-foreground text-background hover:bg-primary transition-all duration-500 font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-foreground/10 active:scale-95"
                         >
                           Passer la commande
@@ -350,21 +354,9 @@ const Header = () => {
           </div>
         </div>
         
-        <CodOrderFormV2
-        isOpen={isCodFormOpen} 
-        onClose={() => setIsCodFormOpen(false)}
-        items={cart.map(item => ({
-          variantId: item.variantId,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image
-        }))}
-        onSuccess={() => {
-          clearCart();
-          setIsCodFormOpen(false);
-        }}
-      />
+        {/* SUPPRIMÉ: <CodOrderFormV2 ... /> — c'était la cause du doublon pixel.
+            Cette instance coexistait avec celle de product-page-client.tsx et cart-drawer.tsx.
+            Résultat : fbEvents.purchase() était appelé 2-3x pour une seule commande. */}
     </header>
   );
 };
