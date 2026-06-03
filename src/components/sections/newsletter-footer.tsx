@@ -74,18 +74,67 @@ const NewsletterFooter = () => {
             </h3>
 
             <div className="flex items-center justify-center gap-10">
-              <a href="#" className="hover:scale-110 transition-transform">
-                <Facebook size={42} strokeWidth={1.5} />
-              </a>
+  <a
+    href="https://urls.fr/ohXYMu"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:scale-110 transition-transform"
+  >
+    <Facebook size={42} strokeWidth={1.5} />
+  </a>
 
-              <a href="#" className="hover:scale-110 transition-transform">
-                <Instagram size={42} strokeWidth={1.5} />
-              </a>
+  <a
+    href="https://urls.fr/N-P9Wj"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:scale-110 transition-transform"
+  >
+    <Instagram size={42} strokeWidth={1.5} />
+  </a>
 
-              <a href="#" className="hover:scale-110 transition-transform">
-                <Youtube size={42} strokeWidth={1.5} />
-              </a>
-            </div>
+  {/* TikTok */}
+  <a
+    href="https://urls.fr/ZkI1f2"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:scale-110 transition-transform"
+  >
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25h-3.1v13.17a2.83 2.83 0 1 1-2.83-2.83c.31 0 .61.05.89.14V9.77a5.94 5.94 0 1 0 5.94 5.94V8.92a7.9 7.9 0 0 0 4.62 1.48V7.32c-.61 0-1.2-.21-1.76-.63Z" />
+    </svg>
+  </a>
+
+  {/* WhatsApp */}
+  <a
+    href="https://urls.fr/PGN6HJ"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:scale-110 transition-transform"
+  >
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M20.52 3.48A11.78 11.78 0 0 0 12.03 0C5.4 0 .03 5.37.03 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.62A11.95 11.95 0 0 0 12.03 24C18.66 24 24.03 18.63 24.03 12c0-3.2-1.25-6.2-3.51-8.52ZM12.03 21.82a9.8 9.8 0 0 1-5-1.37l-.36-.21-3.67.96.98-3.57-.24-.37a9.82 9.82 0 1 1 8.29 4.56Zm5.39-7.36c-.29-.14-1.71-.84-1.97-.94-.27-.1-.46-.14-.66.14-.19.29-.76.94-.93 1.13-.17.19-.34.21-.63.07-.29-.14-1.22-.45-2.33-1.43-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.59.13-.13.29-.34.43-.51.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.14-.66-1.59-.91-2.18-.24-.57-.49-.49-.66-.5h-.57c-.19 0-.5.07-.76.36-.26.29-1 1-.98 2.44.02 1.44 1.03 2.83 1.17 3.02.14.19 2.03 3.11 4.92 4.36.69.3 1.23.48 1.65.61.69.22 1.32.19 1.82.12.56-.08 1.71-.7 1.95-1.38.24-.68.24-1.26.17-1.38-.07-.12-.26-.19-.55-.33Z" />
+    </svg>
+  </a>
+
+  <a
+    href="https://urls.fr/esWtGN"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:scale-110 transition-transform"
+  >
+    <Youtube size={42} strokeWidth={1.5} />
+  </a>
+</div>
           </div>
         </div>
       </section>
