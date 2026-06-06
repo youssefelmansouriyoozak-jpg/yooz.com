@@ -31,9 +31,16 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-export function ShareButton({ 
-  url, 
-  title = "Découvrez ceci sur Yoozak!", 
+// AJOUT: TikTok icon
+const TikTokIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
+  </svg>
+);
+
+export function ShareButton({
+  url,
+  title = "Découvrez ceci sur Yoozak!",
   description = "",
   variant = "default",
   className = ""
@@ -42,6 +49,8 @@ export function ShareButton({
   const [currentUrl, setCurrentUrl] = React.useState(url || "");
   const [copied, setCopied] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
+  // AJOUT: état pour afficher le toast "lien copié pour Instagram/TikTok"
+  const [socialCopyToast, setSocialCopyToast] = React.useState("");
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -55,9 +64,9 @@ export function ShareButton({
 
   const shareText = `${title}${description ? '\n' + description : ''}\n\n👉 `;
 
+  // ── Facebook ── fonctionne parfaitement
   const handleFacebookShare = () => {
     const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(title)}`;
-    
     if (isMobile) {
       window.location.href = fbUrl;
     } else {
@@ -66,11 +75,11 @@ export function ShareButton({
     setIsOpen(false);
   };
 
+  // ── WhatsApp ── fonctionne parfaitement
   const handleWhatsAppShare = () => {
-    const waUrl = isMobile 
+    const waUrl = isMobile
       ? `whatsapp://send?text=${encodeURIComponent(shareText + currentUrl)}`
       : `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText + currentUrl)}`;
-    
     if (isMobile) {
       window.location.href = waUrl;
     } else {
@@ -79,52 +88,61 @@ export function ShareButton({
     setIsOpen(false);
   };
 
+  // ── Instagram ── pas d'API de partage URL (limitation Instagram)
+  // La meilleure solution possible : copier le lien + ouvrir l'app
   const handleInstagramShare = async () => {
-    await handleCopyLink();
+    await copyToClipboard(currentUrl);
+    setSocialCopyToast("instagram");
+    setTimeout(() => setSocialCopyToast(""), 3000);
     if (isMobile) {
-      window.location.href = 'instagram://';
+      setTimeout(() => { window.location.href = 'instagram://'; }, 500);
+    } else {
+      window.open('https://www.instagram.com/', '_blank');
+    }
+  };
+
+  // ── TikTok ── même limitation qu'Instagram, pas d'API de partage URL
+  // Copie le lien + ouvre l'app TikTok
+  const handleTikTokShare = async () => {
+    await copyToClipboard(currentUrl);
+    setSocialCopyToast("tiktok");
+    setTimeout(() => setSocialCopyToast(""), 3000);
+    if (isMobile) {
+      setTimeout(() => { window.location.href = 'snssdk1233://'; }, 500);
+    } else {
+      window.open('https://www.tiktok.com/', '_blank');
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      textArea.style.top = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try { document.execCommand("copy"); } catch (err) { console.error("Copy failed", err); }
+      document.body.removeChild(textArea);
     }
   };
 
   const handleCopyLink = async () => {
-    if (typeof window !== "undefined") {
-      try {
-        await navigator.clipboard.writeText(currentUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        const textArea = document.createElement("textarea");
-        textArea.value = currentUrl;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          document.execCommand("copy");
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-          console.error("Copy failed", err);
-        }
-        document.body.removeChild(textArea);
-      }
-    }
+    await copyToClipboard(currentUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleNativeShare = async () => {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({
-          title: title,
-          text: description || title,
-          url: currentUrl,
-        });
+        await navigator.share({ title, text: description || title, url: currentUrl });
         return true;
-      } catch (err) {
-        return false;
-      }
+      } catch { return false; }
     }
     return false;
   };
@@ -132,9 +150,7 @@ export function ShareButton({
   const handleShareClick = async () => {
     if (isMobile && typeof navigator !== "undefined" && navigator.share) {
       const shared = await handleNativeShare();
-      if (!shared) {
-        setIsOpen(true);
-      }
+      if (!shared) setIsOpen(true);
     } else {
       setIsOpen(true);
     }
@@ -142,18 +158,14 @@ export function ShareButton({
 
   const ShareModal = ({ children }: { children: React.ReactNode }) => {
     if (!isOpen) return null;
-    
     return (
       <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center" onClick={() => setIsOpen(false)}>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-        <div 
+        <div
           className="relative bg-white rounded-t-3xl md:rounded-3xl p-6 md:p-8 w-full md:max-w-md shadow-2xl animate-in slide-in-from-bottom md:zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
-          <button 
-            onClick={() => setIsOpen(false)}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors"
-          >
+          <button onClick={() => setIsOpen(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors">
             <X size={20} />
           </button>
           {children}
@@ -171,55 +183,62 @@ export function ShareButton({
         <h3 className="text-xl font-bold text-foreground mb-2">Partagez avec vos proches!</h3>
         <p className="text-muted-foreground text-sm">Faites découvrir Yoozak à un ami et partagez vos coups de coeur</p>
       </div>
-      
-      <div className="flex justify-center gap-4 mb-6">
-        <button
-          onClick={handleFacebookShare}
-          className="group flex flex-col items-center gap-2"
-          type="button"
-        >
-          <div className="w-14 h-14 rounded-2xl bg-[#1877F2] text-white flex items-center justify-center shadow-lg shadow-[#1877F2]/30 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-[#1877F2]/40 transition-all duration-300 group-active:scale-95">
+
+      {/* Toast Instagram / TikTok */}
+      {socialCopyToast && (
+        <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-2xl flex items-center gap-3 animate-in fade-in duration-200">
+          <Check size={16} className="text-green-600 shrink-0" />
+          <p className="text-xs font-semibold text-green-700">
+            Lien copié ! Collez-le dans votre publication {socialCopyToast === "instagram" ? "Instagram" : "TikTok"} 📋
+          </p>
+        </div>
+      )}
+     
+      {/* 4 boutons : Facebook, WhatsApp, Instagram, TikTok */}
+      <div className="flex justify-center gap-3 mb-6">
+        <button onClick={handleFacebookShare} className="group flex flex-col items-center gap-2" type="button">
+          <div className="w-14 h-14 rounded-2xl bg-[#1877F2] text-white flex items-center justify-center shadow-lg shadow-[#1877F2]/30 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-active:scale-95">
             <FacebookIcon />
           </div>
           <span className="text-xs font-medium text-muted-foreground">Facebook</span>
         </button>
-        <button
-          onClick={handleInstagramShare}
-          className="group flex flex-col items-center gap-2"
-          type="button"
-        >
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white flex items-center justify-center shadow-lg shadow-pink-500/30 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-pink-500/40 transition-all duration-300 group-active:scale-95">
+
+        <button onClick={handleWhatsAppShare} className="group flex flex-col items-center gap-2" type="button">
+          <div className="w-14 h-14 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-lg shadow-[#25D366]/30 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-active:scale-95">
+            <WhatsAppIcon />
+          </div>
+          <span className="text-xs font-medium text-muted-foreground">WhatsApp</span>
+        </button>
+
+        <button onClick={handleInstagramShare} className="group flex flex-col items-center gap-2" type="button">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white flex items-center justify-center shadow-lg shadow-pink-500/30 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-active:scale-95">
             <InstagramIcon />
           </div>
           <span className="text-xs font-medium text-muted-foreground">Instagram</span>
         </button>
-        <button
-          onClick={handleWhatsAppShare}
-          className="group flex flex-col items-center gap-2"
-          type="button"
-        >
-          <div className="w-14 h-14 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-lg shadow-[#25D366]/30 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-[#25D366]/40 transition-all duration-300 group-active:scale-95">
-            <WhatsAppIcon />
+
+        {/* AJOUT TikTok */}
+        <button onClick={handleTikTokShare} className="group flex flex-col items-center gap-2" type="button">
+          <div className="w-14 h-14 rounded-2xl bg-[#010101] text-white flex items-center justify-center shadow-lg shadow-black/30 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-active:scale-95">
+            <TikTokIcon />
           </div>
-          <span className="text-xs font-medium text-muted-foreground">WhatsApp</span>
+          <span className="text-xs font-medium text-muted-foreground">TikTok</span>
         </button>
       </div>
 
       <div className="relative">
         <div className="flex items-center gap-2 p-3 bg-muted rounded-xl">
-          <input 
-            type="text" 
-            value={currentUrl} 
-            readOnly 
+          <input
+            type="text"
+            value={currentUrl}
+            readOnly
             className="flex-1 bg-transparent text-sm text-muted-foreground truncate outline-none"
           />
           <button
             onClick={handleCopyLink}
             type="button"
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
-              copied 
-                ? 'bg-green-500 text-white' 
-                : 'bg-foreground text-background hover:bg-primary'
+              copied ? 'bg-green-500 text-white' : 'bg-foreground text-background hover:bg-primary'
             }`}
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -227,7 +246,7 @@ export function ShareButton({
           </button>
         </div>
       </div>
-      
+     
       <div className="mt-4 pb-4 md:pb-0">
         <p className="text-xs text-center text-muted-foreground">
           {isMobile ? "Appuyez sur une icône pour partager" : "Cliquez sur une icône pour partager"}
@@ -255,9 +274,7 @@ export function ShareButton({
             Partagez avec un ami!
           </div>
         </button>
-        <ShareModal>
-          <ShareContent />
-        </ShareModal>
+        <ShareModal><ShareContent /></ShareModal>
       </>
     );
   }
@@ -273,9 +290,7 @@ export function ShareButton({
           <Heart size={16} className="group-hover:scale-110 transition-transform" />
           <span>Partager</span>
         </button>
-        <ShareModal>
-          <ShareContent />
-        </ShareModal>
+        <ShareModal><ShareContent /></ShareModal>
       </>
     );
   }
@@ -304,9 +319,7 @@ export function ShareButton({
             </button>
           </div>
         </div>
-        <ShareModal>
-          <ShareContent />
-        </ShareModal>
+        <ShareModal><ShareContent /></ShareModal>
       </>
     );
   }
@@ -314,27 +327,25 @@ export function ShareButton({
   if (variant === "icon") {
     return (
       <>
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className={`hover:bg-primary hover:text-white hover:border-primary active:scale-95 transition-all ${className}`} 
+        <Button
+          variant="outline"
+          size="icon"
+          className={`hover:bg-primary hover:text-white hover:border-primary active:scale-95 transition-all ${className}`}
           aria-label="Partager"
           onClick={handleShareClick}
           type="button"
         >
           <Share2 size={18} />
         </Button>
-        <ShareModal>
-          <ShareContent />
-        </ShareModal>
+        <ShareModal><ShareContent /></ShareModal>
       </>
     );
   }
 
   return (
     <>
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         className={`gap-2 hover:bg-primary hover:text-white hover:border-primary active:scale-95 transition-all ${className}`}
         onClick={handleShareClick}
         type="button"
@@ -342,9 +353,7 @@ export function ShareButton({
         <Share2 size={16} />
         Partager
       </Button>
-      <ShareModal>
-        <ShareContent />
-      </ShareModal>
+      <ShareModal><ShareContent /></ShareModal>
     </>
   );
 }

@@ -75,7 +75,7 @@ const NewsletterFooter = () => {
 
             <div className="flex items-center justify-center gap-10">
   <a
-    href="https://urls.fr/ohXYMu"
+    href="https://www.facebook.com/yoozakparfum"
     target="_blank"
     rel="noopener noreferrer"
     className="hover:scale-110 transition-transform"
