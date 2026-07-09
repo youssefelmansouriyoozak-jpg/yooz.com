@@ -11,7 +11,7 @@ const HeroSection: React.FC = () => {
     setMounted(true);
   }, []);
 
-  const heroImage = "https://wjnerekpjeqqbejnvjcd.supabase.co/storage/v1/object/sign/Yoozak/Sabot_Couleur_CozyHome.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MWNhYzI0Yi01NjM0LTQ3ZGMtOTI0Yi1lMzY0ZThiODIwZTYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJZb296YWsvU2Fib3RfQ291bGV1cl9Db3p5SG9tZS5qcGciLCJpYXQiOjE3Njg4NTQxNTMsImV4cCI6NDM2MDg1NDE1M30.4uo0ToSWmeLkE9R4vCusVwHPAr3ElVmZvVsuUtCcALs";
+  const heroImage = "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/BANNER%20IMAGE.jpeg";
 
   if (!mounted) {
     return <div className="h-[280px] md:h-[56.25vw] bg-muted animate-pulse" aria-hidden="true" />;
