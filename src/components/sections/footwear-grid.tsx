@@ -10,9 +10,9 @@ const footwearItems = [
     size: 'large'
   },
   {
-    title: 'CHAUSSURES',
+    title: 'CHAUSSURS',
     video: null,
-    image: ' https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/CHAUSS.jpeg',
+    image: 'https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/CHAUSS.jpeg',
     href: '/collections/chaussures',
     size: 'small'
   },
