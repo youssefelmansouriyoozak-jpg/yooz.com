@@ -3,23 +3,23 @@ import Image from 'next/image';
 
 const footwearItems = [
   {
-    title: 'BOTTES & BOTTINES',
-    video: 'https://wjnerekpjeqqbejnvjcd.supabase.co/storage/v1/object/sign/Yoozak/Botte_anim.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MWNhYzI0Yi01NjM0LTQ3ZGMtOTI0Yi1lMzY0ZThiODIwZTYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJZb296YWsvQm90dGVfYW5pbS5tcDQiLCJpYXQiOjE3Njg4NTI1MDksImV4cCI6NDM2MDg1MjUwOX0.srbdYtGtZUWuTESitQPbxkeVo2s04fGmwLI9IGutFRU',
-    image: 'https://images.unsplash.com/photo-1542288960-f6ad03e72456?auto=format&fit=crop&q=80&w=800',
+    title: 'SANDALES',
+    video: null,
+    image: 'https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/SDL.jpeg ',
     href: '/collections/bottes-et-bottines',
     size: 'large'
   },
   {
     title: 'CHAUSSURES',
-    video: 'https://wjnerekpjeqqbejnvjcd.supabase.co/storage/v1/object/sign/Yoozak/chaussure_anim.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MWNhYzI0Yi01NjM0LTQ3ZGMtOTI0Yi1lMzY0ZThiODIwZTYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJZb296YWsvY2hhdXNzdXJlX2FuaW0ubXA0IiwiaWF0IjoxNzY4ODUxNDExLCJleHAiOjQzNjA4NTE0MTF9.osI1nBrMVtankslPnvdLgGc1KUlJE1XAcd9Z5ZN10vo',
-    image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800',
+    video: null,
+    image: ' https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/CHAUSS.jpeg',
     href: '/collections/chaussures',
     size: 'small'
   },
   {
     title: 'SABOT',
-    video: 'https://wjnerekpjeqqbejnvjcd.supabase.co/storage/v1/object/sign/Yoozak/Sabot_anim.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MWNhYzI0Yi01NjM0LTQ3ZGMtOTI0Yi1lMzY0ZThiODIwZTYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJZb296YWsvU2Fib3RfYW5pbS5tcDQiLCJpYXQiOjE3Njg4NDYzNjYsImV4cCI6Mjc2ODg4NDYzNjZ9.M9e3FmhHIa9FCYuW2NdEnSWn4-JrYC0ax3q66upt_Mk',
-    image: 'https://images.unsplash.com/photo-1614252329309-88339b859046?auto=format&fit=crop&q=80&w=800',
+    video: null,
+    image: 'https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/SAB.jpeg',
     href: '/collections/sabots',
     size: 'small'
   }
