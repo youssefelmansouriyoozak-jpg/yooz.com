@@ -65,7 +65,11 @@ export const adminFetch = async ({ query, variables = {} }: { query: string, var
   export const getProducts = async () => {
     const query = `
       query getProducts {
-        products(first: 10) {
+        products(
+  first: 10
+  sortKey: CREATED
+  reverse: true
+)  {
           edges {
             node {
               id
@@ -180,7 +184,11 @@ export const getProduct = async (handle: string) => {
       query getCollectionProducts($handle: String!) {
         collection(handle: $handle) {
           title
-          products(first: 250) {
+         products(
+  first: 250
+  sortKey: CREATED
+  reverse: true
+) {
             edges {
               node {
                 id
@@ -242,7 +250,11 @@ export const getProduct = async (handle: string) => {
     export const getAllProducts = async () => {
       const query = `
         query getAllProducts {
-          products(first: 250) {
+         products(
+  first: 250
+  sortKey: CREATED
+  reverse: true
+) {
             edges {
               node {
                 id
