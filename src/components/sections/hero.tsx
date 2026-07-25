@@ -12,7 +12,7 @@ const HeroSection: React.FC = () => {
   }, []);
 
   const heroImage =
-    "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/BANEER.jpeg";
+    "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/BANNER%20IMAGE.jpeg";
 
   if (!mounted) {
     return (
