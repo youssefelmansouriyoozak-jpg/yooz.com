@@ -13,7 +13,7 @@ const HeroSection: React.FC = () => {
   }, []);
 
   const heroImage =
-    "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/dimention%20(16,9)22%20sans%20police.jpg";
+    "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/dimention%20(16,9)boit%20sans%20texte.jpg1.jpg.jpeg";
 
   if (!mounted) {
     return (
