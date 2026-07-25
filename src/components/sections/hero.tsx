@@ -11,7 +11,7 @@ const HeroSection: React.FC = () => {
     setMounted(true);
   }, []);
 
-  const heroImage = "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/Sabot_Couleur_CozyHome.jpg";
+  const heroImage = "https://ohmavxqmvgwkngxjfsuy.supabase.co/storage/v1/object/public/yoozak/BANN.jpeg";
 
   if (!mounted) {
     return <div className="h-[280px] md:h-[56.25vw] bg-muted animate-pulse" aria-hidden="true" />;
