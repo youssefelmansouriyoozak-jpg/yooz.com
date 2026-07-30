@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useState, useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   Star,
   Filter,
   X,
   SlidersHorizontal,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { formatPrice, getColorHex } from '@/lib/utils';
+import { formatPrice, getColorHex } from "@/lib/utils";
 
 import {
   Drawer,
@@ -19,7 +19,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
   DrawerFooter,
-} from '@/components/ui/drawer';
+} from "@/components/ui/drawer";
+
+// ============================================================
+// TYPES
+// ============================================================
 
 interface Collection {
   title: string;
@@ -32,21 +36,39 @@ interface ProductListingProps {
   currentCollectionHandle?: string;
 }
 
-const SIZE_NAMES = ['size', 'pointure', 'القياس', 'taille'];
-const COLOR_NAMES = ['color', 'couleur', 'الألوان', 'لون'];
+// ============================================================
+// CONSTANTS
+// ============================================================
 
-const EXCLUDED_COLLECTIONS = [
-  'bonnes affaires',
-  'nos arrivages',
-  'best sellers',
-  'best-sellers',
+const SIZE_NAMES = [
+  "size",
+  "pointure",
+  "القياس",
+  "taille",
 ];
 
-/* ============================================================
-   HELPERS
-============================================================ */
+const COLOR_NAMES = [
+  "color",
+  "couleur",
+  "الألوان",
+  "لون",
+];
 
-function getOption(options: any[], names: string[]) {
+const EXCLUDED_COLLECTIONS = [
+  "bonnes affaires",
+  "nos arrivages",
+  "best sellers",
+  "best-sellers",
+];
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getOption(
+  options: any[],
+  names: string[]
+) {
   if (!Array.isArray(options)) return undefined;
 
   return options.find((option: any) => {
@@ -62,6 +84,10 @@ function getOption(options: any[], names: string[]) {
   });
 }
 
+// ============================================================
+// PRODUCT AVAILABLE
+// ============================================================
+
 function isProductAvailable(product: any): boolean {
   if (!product) return false;
 
@@ -69,22 +95,21 @@ function isProductAvailable(product: any): boolean {
     return false;
   }
 
-  if (Array.isArray(product.variants?.edges)) {
+  if (
+    Array.isArray(product.variants?.edges)
+  ) {
     return product.variants.edges.some(
-      (variant: any) => variant?.node?.availableForSale === true
+      (variantEdge: any) =>
+        variantEdge?.node?.availableForSale === true
     );
   }
 
   return product.availableForSale !== false;
 }
 
-function getProductImage(product: any) {
-  return product?.images?.edges?.[0]?.node;
-}
-
-/* ============================================================
-   FILTER PANEL
-============================================================ */
+// ============================================================
+// FILTER PANEL
+// ============================================================
 
 interface FilterPanelProps {
   filteredCollections: Collection[];
@@ -93,26 +118,27 @@ interface FilterPanelProps {
 
   types: string[];
   selectedType: string;
-  setSelectedType: (value: string) => void;
+  setSelectedType: (v: string) => void;
 
   allSizes: string[];
   selectedSizes: string[];
-  toggleSize: (value: string) => void;
+  toggleSize: (v: string) => void;
 
   allColors: string[];
   selectedColors: string[];
-  toggleColor: (value: string) => void;
-  clearColors: () => void;
+  toggleColor: (v: string) => void;
 
   priceMin: number;
   priceMax: number;
+
   globalPriceMin: number;
   globalPriceMax: number;
-  setPriceMin: (value: number) => void;
-  setPriceMax: (value: number) => void;
+
+  setPriceMin: (v: number) => void;
+  setPriceMax: (v: number) => void;
 
   onlyAvailable: boolean;
-  setOnlyAvailable: (value: boolean) => void;
+  setOnlyAvailable: (v: boolean) => void;
 
   resetFilters: () => void;
   activeFilterCount: number;
@@ -134,12 +160,13 @@ function FilterPanel({
   allColors,
   selectedColors,
   toggleColor,
-  clearColors,
 
   priceMin,
   priceMax,
+
   globalPriceMin,
   globalPriceMax,
+
   setPriceMin,
   setPriceMax,
 
@@ -152,10 +179,7 @@ function FilterPanel({
   return (
     <div className="space-y-8">
 
-      {/* =====================================================
-          COLLECTIONS
-      ===================================================== */}
-
+      {/* COLLECTIONS */}
       {filteredCollections.length > 0 && (
         <section>
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-3">
@@ -163,116 +187,129 @@ function FilterPanel({
           </h3>
 
           <div className="flex flex-wrap gap-2">
+
             <Link
               href="/collections/all"
               onClick={onCloseDrawer}
               className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
                 !currentCollectionHandle
-                  ? 'bg-foreground text-background shadow-md scale-105'
-                  : 'bg-muted/60 text-foreground hover:bg-muted'
+                  ? "bg-foreground text-background shadow-md scale-105"
+                  : "bg-muted/60 text-foreground hover:bg-muted"
               }`}
             >
               Tous
             </Link>
 
-            {filteredCollections.map((collection) => (
-              <Link
-                key={collection.handle}
-                href={`/collections/${collection.handle}`}
-                onClick={onCloseDrawer}
-                className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                  currentCollectionHandle === collection.handle
-                    ? 'bg-foreground text-background shadow-md scale-105'
-                    : 'bg-muted/60 text-foreground hover:bg-muted'
-                }`}
-              >
-                {collection.title}
-              </Link>
-            ))}
+            {filteredCollections.map(
+              (collection) => (
+                <Link
+                  key={collection.handle}
+                  href={`/collections/${collection.handle}`}
+                  onClick={onCloseDrawer}
+                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                    currentCollectionHandle ===
+                    collection.handle
+                      ? "bg-foreground text-background shadow-md scale-105"
+                      : "bg-muted/60 text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {collection.title}
+                </Link>
+              )
+            )}
           </div>
         </section>
       )}
 
-      {/* =====================================================
-          DISPONIBILITE
-      ===================================================== */}
-
+      {/* AVAILABILITY */}
       <section>
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-3">
           Disponibilité
         </h3>
 
-        <button
-          type="button"
-          onClick={() => setOnlyAvailable(!onlyAvailable)}
-          className="flex items-center gap-3 cursor-pointer select-none group"
-        >
-          <div
+        <label className="flex items-center gap-3 cursor-pointer select-none group">
+
+          <button
+            type="button"
+            onClick={() =>
+              setOnlyAvailable(!onlyAvailable)
+            }
+            aria-label="En stock uniquement"
             className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${
-              onlyAvailable ? 'bg-primary' : 'bg-muted'
+              onlyAvailable
+                ? "bg-primary"
+                : "bg-muted"
             }`}
           >
             <span
               className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
-                onlyAvailable ? 'translate-x-5' : 'translate-x-0'
+                onlyAvailable
+                  ? "translate-x-5"
+                  : "translate-x-0"
               }`}
             />
-          </div>
+          </button>
 
           <span className="text-[11px] font-bold uppercase tracking-widest group-hover:text-primary transition-colors">
             En stock uniquement
           </span>
-        </button>
+
+        </label>
       </section>
 
-      {/* =====================================================
-          TYPE
-      ===================================================== */}
-
+      {/* TYPES */}
       {types.length > 1 && (
         <section>
+
           <div className="flex items-center justify-between mb-3">
+
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
               Type de produit
             </h3>
 
-            {selectedType !== 'Tous' && (
+            {selectedType !== "Tous" && (
               <button
                 type="button"
-                onClick={() => setSelectedType('Tous')}
+                onClick={() =>
+                  setSelectedType("Tous")
+                }
                 className="text-[9px] font-black uppercase tracking-widest text-primary"
               >
                 Effacer
               </button>
             )}
+
           </div>
 
           <div className="flex flex-wrap gap-2">
+
             {types.map((type) => (
               <button
                 type="button"
                 key={type}
-                onClick={() => setSelectedType(type)}
+                onClick={() =>
+                  setSelectedType(type)
+                }
                 className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
                   selectedType === type
-                    ? 'bg-primary text-white shadow-md scale-105'
-                    : 'bg-muted/60 text-foreground hover:bg-muted'
+                    ? "bg-primary text-white shadow-md scale-105"
+                    : "bg-muted/60 text-foreground hover:bg-muted"
                 }`}
               >
                 {type}
               </button>
             ))}
+
           </div>
         </section>
       )}
 
-      {/* =====================================================
-          COULEURS
-      ===================================================== */}
-
+      {/* COLORS */}
       {allColors.length > 0 && (
         <section>
+
           <div className="flex items-center justify-between mb-3">
+
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
               Couleur
             </h3>
@@ -280,31 +317,42 @@ function FilterPanel({
             {selectedColors.length > 0 && (
               <button
                 type="button"
-                onClick={clearColors}
+                onClick={() =>
+                  setSelectedColorsDirect(
+                    selectedColors,
+                    toggleColor
+                  )
+                }
                 className="text-[9px] font-black uppercase tracking-widest text-primary"
               >
                 Effacer
               </button>
             )}
+
           </div>
 
           <div className="flex flex-wrap gap-2.5">
+
             {allColors.map((color) => {
               const hex = getColorHex(color);
-              const active = selectedColors.includes(color);
+              const active =
+                selectedColors.includes(color);
 
               return (
                 <button
                   type="button"
                   key={color}
-                  onClick={() => toggleColor(color)}
+                  onClick={() =>
+                    toggleColor(color)
+                  }
                   title={color}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
                     active
-                      ? 'border-primary bg-primary/10 text-primary scale-105 shadow-sm'
-                      : 'border-border/60 bg-muted/40 text-foreground hover:border-primary/40'
+                      ? "border-primary bg-primary/10 text-primary scale-105 shadow-sm"
+                      : "border-border/60 bg-muted/40 text-foreground hover:border-primary/40"
                   }`}
                 >
+
                   <span
                     className="w-3 h-3 rounded-full border border-black/10 flex-shrink-0"
                     style={{
@@ -313,20 +361,21 @@ function FilterPanel({
                   />
 
                   {color}
+
                 </button>
               );
             })}
+
           </div>
         </section>
       )}
 
-      {/* =====================================================
-          TAILLES
-      ===================================================== */}
-
+      {/* SIZES */}
       {allSizes.length > 0 && (
         <section>
+
           <div className="flex items-center justify-between mb-3">
+
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
               Pointure / Taille
             </h3>
@@ -334,46 +383,55 @@ function FilterPanel({
             {selectedSizes.length > 0 && (
               <button
                 type="button"
-                onClick={() => {
-                  selectedSizes.forEach(toggleSize);
-                }}
+                onClick={() =>
+                  setSelectedSizesDirect(
+                    selectedSizes,
+                    toggleSize
+                  )
+                }
                 className="text-[9px] font-black uppercase tracking-widest text-primary"
               >
                 Effacer
               </button>
             )}
+
           </div>
 
           <div className="flex flex-wrap gap-2">
+
             {allSizes.map((size) => {
-              const active = selectedSizes.includes(size);
+
+              const active =
+                selectedSizes.includes(size);
 
               return (
                 <button
                   type="button"
                   key={size}
-                  onClick={() => toggleSize(size)}
+                  onClick={() =>
+                    toggleSize(size)
+                  }
                   className={`min-w-[2.5rem] px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide border transition-all ${
                     active
-                      ? 'bg-foreground text-background border-foreground shadow-md scale-105'
-                      : 'bg-muted/60 text-foreground border-border/40 hover:border-foreground/40'
+                      ? "bg-foreground text-background border-foreground shadow-md scale-105"
+                      : "bg-muted/60 text-foreground border-border/40 hover:border-foreground/40"
                   }`}
                 >
                   {size}
                 </button>
               );
             })}
+
           </div>
         </section>
       )}
 
-      {/* =====================================================
-          PRIX
-      ===================================================== */}
-
+      {/* PRICE */}
       {globalPriceMax > globalPriceMin && (
         <section>
+
           <div className="flex items-center justify-between mb-3">
+
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
               Prix
             </h3>
@@ -381,23 +439,30 @@ function FilterPanel({
             <span className="text-[10px] font-bold text-foreground">
               {priceMin} – {priceMax} MAD
             </span>
+
           </div>
 
           <div className="space-y-3">
+
             <div className="relative h-1.5 bg-muted rounded-full">
 
               <div
                 className="absolute h-full bg-primary rounded-full"
                 style={{
                   left: `${
-                    ((priceMin - globalPriceMin) /
-                      (globalPriceMax - globalPriceMin)) *
+                    ((priceMin -
+                      globalPriceMin) /
+                      (globalPriceMax -
+                        globalPriceMin)) *
                     100
                   }%`,
+
                   right: `${
                     100 -
-                    ((priceMax - globalPriceMin) /
-                      (globalPriceMax - globalPriceMin)) *
+                    ((priceMax -
+                      globalPriceMin) /
+                      (globalPriceMax -
+                        globalPriceMin)) *
                       100
                   }%`,
                 }}
@@ -410,14 +475,20 @@ function FilterPanel({
                 step={10}
                 value={priceMin}
                 onChange={(e) => {
-                  const value = Number(e.target.value);
+                  const value =
+                    Number(e.target.value);
 
                   setPriceMin(
-                    Math.min(value, Math.max(globalPriceMin, priceMax - 10))
+                    Math.min(
+                      value,
+                      priceMax - 10
+                    )
                   );
                 }}
                 className="absolute inset-0 w-full opacity-0 cursor-pointer h-full"
-                style={{ zIndex: 3 }}
+                style={{
+                  zIndex: 3,
+                }}
               />
 
               <input
@@ -427,29 +498,39 @@ function FilterPanel({
                 step={10}
                 value={priceMax}
                 onChange={(e) => {
-                  const value = Number(e.target.value);
+                  const value =
+                    Number(e.target.value);
 
                   setPriceMax(
-                    Math.max(value, Math.min(globalPriceMax, priceMin + 10))
+                    Math.max(
+                      value,
+                      priceMin + 10
+                    )
                   );
                 }}
                 className="absolute inset-0 w-full opacity-0 cursor-pointer h-full"
-                style={{ zIndex: 4 }}
+                style={{
+                  zIndex: 4,
+                }}
               />
+
             </div>
 
             <div className="flex justify-between text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-              <span>{globalPriceMin} MAD</span>
-              <span>{globalPriceMax} MAD</span>
+              <span>
+                {globalPriceMin} MAD
+              </span>
+
+              <span>
+                {globalPriceMax} MAD
+              </span>
             </div>
+
           </div>
         </section>
       )}
 
-      {/* =====================================================
-          RESET
-      ===================================================== */}
-
+      {/* RESET */}
       {activeFilterCount > 0 && (
         <button
           type="button"
@@ -458,16 +539,36 @@ function FilterPanel({
         >
           <X size={11} />
 
-          Réinitialiser tous les filtres ({activeFilterCount})
+          Réinitialiser tous les filtres (
+          {activeFilterCount})
         </button>
       )}
+
     </div>
   );
 }
 
-/* ============================================================
-   MAIN PRODUCT LISTING
-============================================================ */
+// ============================================================
+// CLEAR FILTER HELPERS
+// ============================================================
+
+function setSelectedColorsDirect(
+  selected: string[],
+  toggle: (value: string) => void
+) {
+  selected.forEach(toggle);
+}
+
+function setSelectedSizesDirect(
+  selected: string[],
+  toggle: (value: string) => void
+) {
+  selected.forEach(toggle);
+}
+
+// ============================================================
+// MAIN
+// ============================================================
 
 export default function ProductListing({
   initialProducts,
@@ -475,35 +576,47 @@ export default function ProductListing({
   currentCollectionHandle,
 }: ProductListingProps) {
 
-  const safeProducts = Array.isArray(initialProducts)
-    ? initialProducts
-    : [];
+  const filteredCollections =
+    collections.filter(
+      (collection) =>
+        !EXCLUDED_COLLECTIONS.some(
+          (excluded) =>
+            collection.title
+              .toLowerCase()
+              .includes(excluded) ||
+            collection.handle
+              .toLowerCase()
+              .includes(
+                excluded.replace(" ", "-")
+              )
+        )
+    );
 
-  const filteredCollections = collections.filter(
-    (collection) =>
-      !EXCLUDED_COLLECTIONS.some(
-        (excluded) =>
-          collection.title.toLowerCase().includes(excluded) ||
-          collection.handle
-            .toLowerCase()
-            .includes(excluded.replace(' ', '-'))
-      )
-  );
+  // ==========================================================
+  // STATES
+  // ==========================================================
 
-  /* ============================================================
-     FILTER STATE
-  ============================================================ */
+  const [selectedType, setSelectedType] =
+    useState("Tous");
 
-  const [selectedType, setSelectedType] = useState('Tous');
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [onlyAvailable, setOnlyAvailable] = useState(false);
-  const [sortBy, setSortBy] = useState('featured');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedSizes, setSelectedSizes] =
+    useState<string[]>([]);
 
-  /* ============================================================
-     DERIVED DATA
-  ============================================================ */
+  const [selectedColors, setSelectedColors] =
+    useState<string[]>([]);
+
+  const [onlyAvailable, setOnlyAvailable] =
+    useState(false);
+
+  const [sortBy, setSortBy] =
+    useState("featured");
+
+  const [isFilterOpen, setIsFilterOpen] =
+    useState(false);
+
+  // ==========================================================
+  // DERIVED DATA
+  // ==========================================================
 
   const {
     types,
@@ -513,268 +626,453 @@ export default function ProductListing({
     globalPriceMax,
   } = useMemo(() => {
 
-    const productTypes = safeProducts
-      .map((item) => item?.node?.productType)
-      .filter(
-        (type): type is string =>
-          typeof type === 'string' && type.trim() !== ''
-      );
+    const productTypes =
+      initialProducts
+        .map(
+          (product) =>
+            product?.node?.productType
+        )
+        .filter(
+          (type): type is string =>
+            Boolean(
+              type &&
+              type.trim() !== ""
+            )
+        );
 
     const uniqueTypes = [
-      'Tous',
-      ...Array.from(new Set(productTypes)).sort(),
+      "Tous",
+      ...Array.from(
+        new Set(productTypes)
+      ).sort(),
     ];
 
-    const sizesSet = new Set<string>();
-    const colorsSet = new Set<string>();
+    const sizesSet =
+      new Set<string>();
+
+    const colorsSet =
+      new Set<string>();
 
     let minPrice = Infinity;
     let maxPrice = 0;
 
-    safeProducts.forEach((edge) => {
-      const product = edge?.node;
+    initialProducts.forEach(
+      (edge: any) => {
 
-      if (!product) return;
+        const product =
+          edge?.node;
 
-      const sizeOption = getOption(product.options, SIZE_NAMES);
-      const colorOption = getOption(product.options, COLOR_NAMES);
+        if (!product) return;
 
-      sizeOption?.values?.forEach((value: string) => {
-        sizesSet.add(value);
-      });
+        const sizeOption =
+          getOption(
+            product.options,
+            SIZE_NAMES
+          );
 
-      colorOption?.values?.forEach((value: string) => {
-        colorsSet.add(value);
-      });
+        const colorOption =
+          getOption(
+            product.options,
+            COLOR_NAMES
+          );
 
-      const amount = parseFloat(
-        product?.priceRange?.minVariantPrice?.amount || '0'
-      );
+        sizeOption?.values?.forEach(
+          (value: string) =>
+            sizesSet.add(value)
+        );
 
-      if (amount < minPrice) {
-        minPrice = amount;
+        colorOption?.values?.forEach(
+          (value: string) =>
+            colorsSet.add(value)
+        );
+
+        const amount =
+          product
+            ?.priceRange
+            ?.minVariantPrice
+            ?.amount;
+
+        const price =
+          Number.parseFloat(amount);
+
+        if (!Number.isNaN(price)) {
+          minPrice =
+            Math.min(
+              minPrice,
+              price
+            );
+
+          maxPrice =
+            Math.max(
+              maxPrice,
+              price
+            );
+        }
       }
-
-      if (amount > maxPrice) {
-        maxPrice = amount;
-      }
-    });
+    );
 
     return {
       types: uniqueTypes,
-      allSizes: Array.from(sizesSet),
-      allColors: Array.from(colorsSet),
+
+      allSizes:
+        Array.from(sizesSet),
+
+      allColors:
+        Array.from(colorsSet),
+
       globalPriceMin:
-        minPrice === Infinity ? 0 : Math.floor(minPrice),
+        minPrice === Infinity
+          ? 0
+          : Math.floor(minPrice),
+
       globalPriceMax:
-        maxPrice === 0 ? 10000 : Math.ceil(maxPrice),
+        maxPrice === 0
+          ? 10000
+          : Math.ceil(maxPrice),
     };
 
-  }, [safeProducts]);
+  }, [initialProducts]);
 
-  /* ============================================================
-     PRICE STATE
-  ============================================================ */
+  // ==========================================================
+  // PRICE STATES
+  // ==========================================================
 
-  const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(10000);
+  const [priceMin, setPriceMin] =
+    useState<number>(() => {
 
-  /* Sync prices when products change */
-  useMemo(() => {
-    setPriceMin(globalPriceMin);
-    setPriceMax(globalPriceMax);
-  }, [globalPriceMin, globalPriceMax]);
+      if (!initialProducts.length) {
+        return 0;
+      }
 
-  /* ============================================================
-     FILTER FUNCTIONS
-  ============================================================ */
+      const prices =
+        initialProducts
+          .map(
+            (product) =>
+              Number.parseFloat(
+                product?.node
+                  ?.priceRange
+                  ?.minVariantPrice
+                  ?.amount
+              )
+          )
+          .filter(
+            (price) =>
+              !Number.isNaN(price)
+          );
 
-  const toggleSize = (value: string) => {
-    setSelectedSizes((previous) =>
-      previous.includes(value)
-        ? previous.filter((item) => item !== value)
-        : [...previous, value]
+      return prices.length
+        ? Math.floor(
+            Math.min(...prices)
+          )
+        : 0;
+    });
+
+  const [priceMax, setPriceMax] =
+    useState<number>(() => {
+
+      if (!initialProducts.length) {
+        return 10000;
+      }
+
+      const prices =
+        initialProducts
+          .map(
+            (product) =>
+              Number.parseFloat(
+                product?.node
+                  ?.priceRange
+                  ?.minVariantPrice
+                  ?.amount
+              )
+          )
+          .filter(
+            (price) =>
+              !Number.isNaN(price)
+          );
+
+      return prices.length
+        ? Math.ceil(
+            Math.max(...prices)
+          )
+        : 10000;
+    });
+
+  // ==========================================================
+  // ACTIVE FILTER COUNT
+  // ==========================================================
+
+  const activeFilterCount =
+    useMemo(() => {
+
+      let count = 0;
+
+      if (
+        selectedType !== "Tous"
+      ) {
+        count++;
+      }
+
+      count +=
+        selectedSizes.length;
+
+      count +=
+        selectedColors.length;
+
+      if (onlyAvailable) {
+        count++;
+      }
+
+      if (
+        priceMin >
+          globalPriceMin ||
+        priceMax <
+          globalPriceMax
+      ) {
+        count++;
+      }
+
+      return count;
+
+    }, [
+      selectedType,
+      selectedSizes,
+      selectedColors,
+      onlyAvailable,
+      priceMin,
+      priceMax,
+      globalPriceMin,
+      globalPriceMax,
+    ]);
+
+  // ==========================================================
+  // FILTER HELPERS
+  // ==========================================================
+
+  const toggleSize = (
+    value: string
+  ) => {
+
+    setSelectedSizes(
+      (previous) =>
+        previous.includes(value)
+          ? previous.filter(
+              (item) =>
+                item !== value
+            )
+          : [
+              ...previous,
+              value,
+            ]
     );
   };
 
-  const toggleColor = (value: string) => {
-    setSelectedColors((previous) =>
-      previous.includes(value)
-        ? previous.filter((item) => item !== value)
-        : [...previous, value]
-    );
-  };
+  const toggleColor = (
+    value: string
+  ) => {
 
-  const clearColors = () => {
-    setSelectedColors([]);
+    setSelectedColors(
+      (previous) =>
+        previous.includes(value)
+          ? previous.filter(
+              (item) =>
+                item !== value
+            )
+          : [
+              ...previous,
+              value,
+            ]
+    );
   };
 
   const resetFilters = () => {
-    setSelectedType('Tous');
+
+    setSelectedType("Tous");
+
     setSelectedSizes([]);
+
     setSelectedColors([]);
+
     setOnlyAvailable(false);
-    setPriceMin(globalPriceMin);
-    setPriceMax(globalPriceMax);
+
+    setPriceMin(
+      globalPriceMin
+    );
+
+    setPriceMax(
+      globalPriceMax
+    );
   };
 
-  /* ============================================================
-     ACTIVE FILTER COUNT
-  ============================================================ */
+  // ==========================================================
+  // FILTER PRODUCTS
+  // ==========================================================
 
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
+  const filteredProducts =
+    useMemo(() => {
 
-    if (selectedType !== 'Tous') {
-      count++;
-    }
+      let result =
+        [...initialProducts];
 
-    count += selectedSizes.length;
-    count += selectedColors.length;
+      if (
+        selectedType !==
+        "Tous"
+      ) {
+        result =
+          result.filter(
+            (product) =>
+              (
+                product?.node
+                  ?.productType || ""
+              ) === selectedType
+          );
+      }
 
-    if (onlyAvailable) {
-      count++;
-    }
+      if (onlyAvailable) {
+        result =
+          result.filter(
+            (product) =>
+              isProductAvailable(
+                product?.node
+              )
+          );
+      }
 
-    if (
-      priceMin > globalPriceMin ||
-      priceMax < globalPriceMax
-    ) {
-      count++;
-    }
+      result =
+        result.filter(
+          (product) => {
 
-    return count;
-  }, [
-    selectedType,
-    selectedSizes,
-    selectedColors,
-    onlyAvailable,
-    priceMin,
-    priceMax,
-    globalPriceMin,
-    globalPriceMax,
-  ]);
+            const amount =
+              product?.node
+                ?.priceRange
+                ?.minVariantPrice
+                ?.amount;
 
-  /* ============================================================
-     FILTER PRODUCTS
-  ============================================================ */
+            const price =
+              Number.parseFloat(
+                amount
+              );
 
-  const filteredProducts = useMemo(() => {
-
-    let result = [...safeProducts];
-
-    /* TYPE */
-    if (selectedType !== 'Tous') {
-      result = result.filter(
-        (item) =>
-          item?.node?.productType === selectedType
-      );
-    }
-
-    /* STOCK */
-    if (onlyAvailable) {
-      result = result.filter((item) =>
-        isProductAvailable(item?.node)
-      );
-    }
-
-    /* PRICE */
-    result = result.filter((item) => {
-
-      const price = parseFloat(
-        item?.node?.priceRange?.minVariantPrice?.amount || '0'
-      );
-
-      return price >= priceMin && price <= priceMax;
-    });
-
-    /* SIZE */
-    if (selectedSizes.length > 0) {
-      result = result.filter((item) => {
-
-        const sizeOption = getOption(
-          item?.node?.options,
-          SIZE_NAMES
+            return (
+              !Number.isNaN(price) &&
+              price >= priceMin &&
+              price <= priceMax
+            );
+          }
         );
 
-        const productSizes =
-          sizeOption?.values || [];
+      if (
+        selectedSizes.length > 0
+      ) {
 
-        return selectedSizes.some((size) =>
-          productSizes.includes(size)
+        result =
+          result.filter(
+            (product) => {
+
+              const option =
+                getOption(
+                  product?.node
+                    ?.options,
+                  SIZE_NAMES
+                );
+
+              const sizes =
+                option?.values || [];
+
+              return selectedSizes.some(
+                (size) =>
+                  sizes.includes(size)
+              );
+            }
+          );
+      }
+
+      if (
+        selectedColors.length > 0
+      ) {
+
+        result =
+          result.filter(
+            (product) => {
+
+              const option =
+                getOption(
+                  product?.node
+                    ?.options,
+                  COLOR_NAMES
+                );
+
+              const colors =
+                option?.values || [];
+
+              return selectedColors.some(
+                (color) =>
+                  colors.includes(color)
+              );
+            }
+          );
+      }
+
+      if (
+        sortBy ===
+        "price-asc"
+      ) {
+
+        result.sort(
+          (a, b) =>
+            Number.parseFloat(
+              a.node.priceRange
+                .minVariantPrice
+                .amount
+            ) -
+            Number.parseFloat(
+              b.node.priceRange
+                .minVariantPrice
+                .amount
+            )
         );
-      });
-    }
+      }
 
-    /* COLOR */
-    if (selectedColors.length > 0) {
-      result = result.filter((item) => {
+      if (
+        sortBy ===
+        "price-desc"
+      ) {
 
-        const colorOption = getOption(
-          item?.node?.options,
-          COLOR_NAMES
+        result.sort(
+          (a, b) =>
+            Number.parseFloat(
+              b.node.priceRange
+                .minVariantPrice
+                .amount
+            ) -
+            Number.parseFloat(
+              a.node.priceRange
+                .minVariantPrice
+                .amount
+            )
         );
+      }
 
-        const productColors =
-          colorOption?.values || [];
+      return result;
 
-        return selectedColors.some((color) =>
-          productColors.includes(color)
-        );
-      });
-    }
+    }, [
+      initialProducts,
+      selectedType,
+      onlyAvailable,
+      priceMin,
+      priceMax,
+      selectedSizes,
+      selectedColors,
+      sortBy,
+    ]);
 
-    /* SORT */
-    if (sortBy === 'price-asc') {
-      result.sort((a, b) => {
+  // ==========================================================
+  // FILTER PANEL PROPS
+  // ==========================================================
 
-        const priceA = parseFloat(
-          a?.node?.priceRange?.minVariantPrice?.amount || '0'
-        );
-
-        const priceB = parseFloat(
-          b?.node?.priceRange?.minVariantPrice?.amount || '0'
-        );
-
-        return priceA - priceB;
-      });
-    }
-
-    if (sortBy === 'price-desc') {
-      result.sort((a, b) => {
-
-        const priceA = parseFloat(
-          a?.node?.priceRange?.minVariantPrice?.amount || '0'
-        );
-
-        const priceB = parseFloat(
-          b?.node?.priceRange?.minVariantPrice?.amount || '0'
-        );
-
-        return priceB - priceA;
-      });
-    }
-
-    return result;
-
-  }, [
-    safeProducts,
-    selectedType,
-    onlyAvailable,
-    priceMin,
-    priceMax,
-    selectedSizes,
-    selectedColors,
-    sortBy,
-  ]);
-
-  /* ============================================================
-     FILTER PANEL PROPS
-  ============================================================ */
-
-  const filterPanelProps: FilterPanelProps = {
+  const filterPanelProps = {
     filteredCollections,
     currentCollectionHandle,
+
     types,
     selectedType,
     setSelectedType,
@@ -786,12 +1084,13 @@ export default function ProductListing({
     allColors,
     selectedColors,
     toggleColor,
-    clearColors,
 
     priceMin,
     priceMax,
+
     globalPriceMin,
     globalPriceMax,
+
     setPriceMin,
     setPriceMax,
 
@@ -802,17 +1101,14 @@ export default function ProductListing({
     activeFilterCount,
   };
 
-  /* ============================================================
-     RENDER
-  ============================================================ */
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
     <div className="flex flex-col gap-8">
 
-      {/* ========================================================
-          DESKTOP SORT BAR
-      ======================================================== */}
-
+      {/* DESKTOP SORT */}
       <div className="hidden md:flex items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-border/50 sticky top-24 z-30 shadow-sm">
 
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
@@ -821,15 +1117,20 @@ export default function ProductListing({
 
           <span>
             {filteredProducts.length} produit
-            {filteredProducts.length !== 1 ? 's' : ''}
+            {filteredProducts.length !== 1
+              ? "s"
+              : ""}
           </span>
 
           {activeFilterCount > 0 && (
             <span className="ml-1 bg-primary text-white rounded-full px-2 py-0.5 text-[9px]">
               {activeFilterCount} filtre
-              {activeFilterCount > 1 ? 's' : ''}
+              {activeFilterCount > 1
+                ? "s"
+                : ""}
             </span>
           )}
+
         </div>
 
         <div className="flex items-center gap-3">
@@ -840,27 +1141,31 @@ export default function ProductListing({
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(event) =>
+              setSortBy(
+                event.target.value
+              )
+            }
             className="bg-muted/50 text-foreground px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest outline-none border-none cursor-pointer hover:bg-muted transition-colors"
           >
-            <option value="featured">En vedette</option>
+            <option value="featured">
+              En vedette
+            </option>
+
             <option value="price-asc">
               Prix: Croissant
             </option>
+
             <option value="price-desc">
               Prix: Décroissant
             </option>
           </select>
+
         </div>
       </div>
 
-      {/* ========================================================
-          DESKTOP
-      ======================================================== */}
-
+      {/* DESKTOP */}
       <div className="hidden md:flex gap-8 items-start">
-
-        {/* SIDEBAR */}
 
         <aside className="w-64 flex-shrink-0 sticky top-40 bg-white border border-border/50 rounded-3xl p-6 shadow-sm max-h-[calc(100vh-11rem)] overflow-y-auto">
 
@@ -873,59 +1178,91 @@ export default function ProductListing({
             {activeFilterCount > 0 && (
               <button
                 type="button"
-                onClick={resetFilters}
+                onClick={
+                  resetFilters
+                }
                 className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-1"
               >
                 <X size={10} />
-                Reset ({activeFilterCount})
+                Reset (
+                {activeFilterCount})
               </button>
             )}
 
           </div>
 
-          <FilterPanel {...filterPanelProps} />
+          <FilterPanel
+            {...filterPanelProps}
+          />
 
         </aside>
-
-        {/* PRODUCTS */}
 
         <div className="flex-1">
 
           <ActiveFilters
-            selectedType={selectedType}
-            setSelectedType={setSelectedType}
-            onlyAvailable={onlyAvailable}
-            setOnlyAvailable={setOnlyAvailable}
+            activeFilterCount={
+              activeFilterCount
+            }
+            selectedType={
+              selectedType
+            }
+            setSelectedType={
+              setSelectedType
+            }
+            onlyAvailable={
+              onlyAvailable
+            }
+            setOnlyAvailable={
+              setOnlyAvailable
+            }
             priceMin={priceMin}
             priceMax={priceMax}
-            globalPriceMin={globalPriceMin}
-            globalPriceMax={globalPriceMax}
-            selectedColors={selectedColors}
-            toggleColor={toggleColor}
-            selectedSizes={selectedSizes}
-            toggleSize={toggleSize}
-            activeFilterCount={activeFilterCount}
-            setPriceMin={setPriceMin}
-            setPriceMax={setPriceMax}
+            globalPriceMin={
+              globalPriceMin
+            }
+            globalPriceMax={
+              globalPriceMax
+            }
+            setPriceMin={
+              setPriceMin
+            }
+            setPriceMax={
+              setPriceMax
+            }
+            selectedColors={
+              selectedColors
+            }
+            toggleColor={
+              toggleColor
+            }
+            selectedSizes={
+              selectedSizes
+            }
+            toggleSize={
+              toggleSize
+            }
           />
 
           <ProductGrid
-            products={filteredProducts}
-            resetFilters={resetFilters}
+            products={
+              filteredProducts
+            }
+            resetFilters={
+              resetFilters
+            }
           />
 
         </div>
       </div>
 
-      {/* ========================================================
-          MOBILE FILTER BAR
-      ======================================================== */}
-
+      {/* MOBILE */}
       <div className="md:hidden flex gap-3 sticky top-[80px] z-30 bg-[#FBFBFB]/90 backdrop-blur-md py-4">
 
         <Drawer
           open={isFilterOpen}
-          onOpenChange={setIsFilterOpen}
+          onOpenChange={
+            setIsFilterOpen
+          }
         >
 
           <DrawerTrigger asChild>
@@ -934,15 +1271,22 @@ export default function ProductListing({
               type="button"
               className="flex-1 flex items-center justify-center gap-2 bg-white border border-border/50 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-transform"
             >
-              <SlidersHorizontal size={14} />
+
+              <SlidersHorizontal
+                size={14}
+              />
 
               Filtres
 
-              {activeFilterCount > 0 && (
+              {activeFilterCount >
+                0 && (
                 <span className="bg-primary text-white rounded-full px-1.5 py-0.5 text-[9px] ml-0.5">
-                  {activeFilterCount}
+                  {
+                    activeFilterCount
+                  }
                 </span>
               )}
+
             </button>
 
           </DrawerTrigger>
@@ -960,7 +1304,9 @@ export default function ProductListing({
             <FilterPanel
               {...filterPanelProps}
               onCloseDrawer={() =>
-                setIsFilterOpen(false)
+                setIsFilterOpen(
+                  false
+                )
               }
             />
 
@@ -969,12 +1315,21 @@ export default function ProductListing({
               <button
                 type="button"
                 onClick={() =>
-                  setIsFilterOpen(false)
+                  setIsFilterOpen(
+                    false
+                  )
                 }
                 className="w-full bg-foreground text-background py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-all"
               >
-                Voir {filteredProducts.length} produit
-                {filteredProducts.length !== 1 ? 's' : ''}
+                Voir{" "}
+                {
+                  filteredProducts.length
+                }{" "}
+                produit
+                {filteredProducts.length !==
+                1
+                  ? "s"
+                  : ""}
               </button>
 
             </DrawerFooter>
@@ -985,11 +1340,14 @@ export default function ProductListing({
 
         <select
           value={sortBy}
-          onChange={(e) =>
-            setSortBy(e.target.value)
+          onChange={(event) =>
+            setSortBy(
+              event.target.value
+            )
           }
           className="flex-1 bg-white border border-border/50 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center outline-none shadow-sm appearance-none"
         >
+
           <option value="featured">
             Trier par
           </option>
@@ -1001,37 +1359,65 @@ export default function ProductListing({
           <option value="price-desc">
             Prix ↓
           </option>
+
         </select>
 
       </div>
 
-      {/* ========================================================
-          MOBILE PRODUCTS
-      ======================================================== */}
-
+      {/* MOBILE CHIPS + GRID */}
       <div className="md:hidden">
 
         <ActiveFilters
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-          onlyAvailable={onlyAvailable}
-          setOnlyAvailable={setOnlyAvailable}
+          activeFilterCount={
+            activeFilterCount
+          }
+          selectedType={
+            selectedType
+          }
+          setSelectedType={
+            setSelectedType
+          }
+          onlyAvailable={
+            onlyAvailable
+          }
+          setOnlyAvailable={
+            setOnlyAvailable
+          }
           priceMin={priceMin}
           priceMax={priceMax}
-          globalPriceMin={globalPriceMin}
-          globalPriceMax={globalPriceMax}
-          selectedColors={selectedColors}
-          toggleColor={toggleColor}
-          selectedSizes={selectedSizes}
-          toggleSize={toggleSize}
-          activeFilterCount={activeFilterCount}
-          setPriceMin={setPriceMin}
-          setPriceMax={setPriceMax}
+          globalPriceMin={
+            globalPriceMin
+          }
+          globalPriceMax={
+            globalPriceMax
+          }
+          setPriceMin={
+            setPriceMin
+          }
+          setPriceMax={
+            setPriceMax
+          }
+          selectedColors={
+            selectedColors
+          }
+          toggleColor={
+            toggleColor
+          }
+          selectedSizes={
+            selectedSizes
+          }
+          toggleSize={
+            toggleSize
+          }
         />
 
         <ProductGrid
-          products={filteredProducts}
-          resetFilters={resetFilters}
+          products={
+            filteredProducts
+          }
+          resetFilters={
+            resetFilters
+          }
         />
 
       </div>
@@ -1040,11 +1426,12 @@ export default function ProductListing({
   );
 }
 
-/* ============================================================
-   ACTIVE FILTERS
-============================================================ */
+// ============================================================
+// ACTIVE FILTERS
+// ============================================================
 
 function ActiveFilters({
+  activeFilterCount,
   selectedType,
   setSelectedType,
   onlyAvailable,
@@ -1053,13 +1440,12 @@ function ActiveFilters({
   priceMax,
   globalPriceMin,
   globalPriceMax,
+  setPriceMin,
+  setPriceMax,
   selectedColors,
   toggleColor,
   selectedSizes,
   toggleSize,
-  activeFilterCount,
-  setPriceMin,
-  setPriceMax,
 }: any) {
 
   if (activeFilterCount <= 0) {
@@ -1069,11 +1455,11 @@ function ActiveFilters({
   return (
     <div className="flex flex-wrap gap-2 mb-6">
 
-      {selectedType !== 'Tous' && (
+      {selectedType !== "Tous" && (
         <ActiveChip
           label={`Type: ${selectedType}`}
           onRemove={() =>
-            setSelectedType('Tous')
+            setSelectedType("Tous")
           }
         />
       )}
@@ -1087,44 +1473,54 @@ function ActiveFilters({
         />
       )}
 
-      {(priceMin > globalPriceMin ||
-        priceMax < globalPriceMax) && (
+      {(
+        priceMin > globalPriceMin ||
+        priceMax < globalPriceMax
+      ) && (
         <ActiveChip
           label={`Prix: ${priceMin}–${priceMax} MAD`}
           onRemove={() => {
-            setPriceMin(globalPriceMin);
-            setPriceMax(globalPriceMax);
+            setPriceMin(
+              globalPriceMin
+            );
+            setPriceMax(
+              globalPriceMax
+            );
           }}
         />
       )}
 
-      {selectedColors.map((color: string) => (
-        <ActiveChip
-          key={`color-${color}`}
-          label={`Couleur: ${color}`}
-          onRemove={() =>
-            toggleColor(color)
-          }
-        />
-      ))}
+      {selectedColors.map(
+        (color: string) => (
+          <ActiveChip
+            key={color}
+            label={`Couleur: ${color}`}
+            onRemove={() =>
+              toggleColor(color)
+            }
+          />
+        )
+      )}
 
-      {selectedSizes.map((size: string) => (
-        <ActiveChip
-          key={`size-${size}`}
-          label={`Pointure: ${size}`}
-          onRemove={() =>
-            toggleSize(size)
-          }
-        />
-      ))}
+      {selectedSizes.map(
+        (size: string) => (
+          <ActiveChip
+            key={size}
+            label={`Pointure: ${size}`}
+            onRemove={() =>
+              toggleSize(size)
+            }
+          />
+        )
+      )}
 
     </div>
   );
 }
 
-/* ============================================================
-   ACTIVE CHIP
-============================================================ */
+// ============================================================
+// ACTIVE CHIP
+// ============================================================
 
 function ActiveChip({
   label,
@@ -1133,6 +1529,7 @@ function ActiveChip({
   label: string;
   onRemove: () => void;
 }) {
+
   return (
     <button
       type="button"
@@ -1146,9 +1543,9 @@ function ActiveChip({
   );
 }
 
-/* ============================================================
-   PRODUCT GRID
-============================================================ */
+// ============================================================
+// PRODUCT GRID
+// ============================================================
 
 function ProductGrid({
   products,
@@ -1158,11 +1555,8 @@ function ProductGrid({
   resetFilters: () => void;
 }) {
 
-  /* ==========================================================
-     EMPTY
-  ========================================================== */
-
   if (products.length === 0) {
+
     return (
       <div className="py-20 text-center">
 
@@ -1193,168 +1587,253 @@ function ProductGrid({
     );
   }
 
-  /* ==========================================================
-     GRID
-  ========================================================== */
-
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 gap-y-8 md:gap-y-12">
 
-      {products.map((edge: any) => {
+      {products.map(
+        (edge: any) => {
 
-        const product = edge?.node;
+          const product =
+            edge?.node;
 
-        if (!product) {
-          return null;
-        }
+          if (!product) {
+            return null;
+          }
 
-        const image = getProductImage(product);
+          const image =
+            product?.images
+              ?.edges?.[0]
+              ?.node;
 
-        const price = formatPrice(
-          product?.priceRange?.minVariantPrice?.amount || '0'
-        );
+          const imageUrl =
+            image?.url || "";
 
-        const sizes =
-          getOption(
-            product.options,
-            SIZE_NAMES
-          )?.values || [];
+          const imageAlt =
+            image?.altText ||
+            product.title ||
+            "Produit";
 
-        const productColors =
-          getOption(
-            product.options,
-            COLOR_NAMES
-          )?.values || [];
+          const price =
+            formatPrice(
+              product
+                ?.priceRange
+                ?.minVariantPrice
+                ?.amount || "0"
+            );
 
-        const available =
-          isProductAvailable(product);
+          const sizes =
+            getOption(
+              product.options,
+              SIZE_NAMES
+            )?.values || [];
 
-        return (
-          <div
-            key={product.id}
-            className="group flex flex-col"
-          >
+          const productColors =
+            getOption(
+              product.options,
+              COLOR_NAMES
+            )?.values || [];
 
-            {/* ==================================================
-                IMAGE
-            ================================================== */}
+          const available =
+            isProductAvailable(
+              product
+            );
 
-            <Link
-              href={`/products/${product.handle}`}
-              className="relative aspect-[4/5] mb-4 md:mb-5 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] bg-white border border-border/50 block group-hover:shadow-lg transition-all duration-500"
+          return (
+            <div
+              key={product.id}
+              className="group flex flex-col"
             >
 
-              {image?.url ? (
-                <div className="absolute inset-0 p-3 md:p-4">
+              {/* =================================================
+                  IMAGE
+              ================================================= */}
 
-                  <Image
-                    src={image.url}
-                    alt={
-                      image.altText ||
-                      product.title ||
-                      'Produit'
-                    }
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-contain transition-transform duration-700 group-hover:scale-105"
-                  />
+              <Link
+                href={`/products/${product.handle}`}
+                className="relative aspect-[4/5] mb-4 md:mb-5 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] bg-white border border-border/50 block group-hover:shadow-lg transition-all duration-500"
+              >
 
+                {imageUrl ? (
+                  <div className="absolute inset-0 p-3 md:p-4">
+
+                    <Image
+                      src={imageUrl}
+                      alt={imageAlt}
+                      fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      className="object-contain transition-transform duration-700 group-hover:scale-105"
+                      unoptimized
+                    />
+
+                  </div>
+                ) : (
+
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted">
+
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      Image indisponible
+                    </span>
+
+                  </div>
+                )}
+
+                {/* STOCK */}
+                {!available && (
+                  <div className="absolute top-3 left-3 bg-black/70 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full backdrop-blur-sm">
+                    Épuisé
+                  </div>
+                )}
+
+                {/* DESKTOP QUICK ACTION */}
+                <div className="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hidden md:block">
+
+                  <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl flex flex-col gap-2">
+
+                    <div className="flex flex-wrap gap-1 justify-center">
+
+                      {sizes
+                        .slice(0, 6)
+                        .map(
+                          (size: string) => (
+                            <span
+                              key={size}
+                              className="text-[8px] font-bold px-1.5 py-0.5 bg-foreground/5 rounded text-foreground/70 uppercase"
+                            >
+                              {size}
+                            </span>
+                          )
+                        )}
+
+                      {sizes.length >
+                        6 && (
+                        <span className="text-[8px] font-bold px-1.5 py-0.5 text-foreground/40">
+                          +
+                          {sizes.length -
+                            6}
+                        </span>
+                      )}
+
+                    </div>
+
+                    <div className="h-px bg-border/50 w-full" />
+
+                    <span className="text-[9px] font-black uppercase tracking-widest text-foreground text-center">
+                      Voir les détails
+                    </span>
+
+                  </div>
                 </div>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                    Image indisponible
-                  </span>
-                </div>
-              )}
 
-              {/* STOCK */}
+              </Link>
 
-              {!available && (
-                <div className="absolute top-3 left-3 bg-black/70 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full backdrop-blur-sm">
-                  Épuisé
-                </div>
-              )}
+              {/* =================================================
+                  PRODUCT INFO
+              ================================================= */}
 
-              {/* DESKTOP QUICK INFO */}
+              <div className="px-1">
 
-              <div className="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hidden md:block">
+                <div className="flex items-center justify-between mb-1.5 md:mb-2">
 
-                <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl flex flex-col gap-2">
+                  <div className="flex items-center gap-0.5 md:gap-1">
 
-                  <div className="flex flex-wrap gap-1 justify-center">
+                    {[1, 2, 3, 4, 5].map(
+                      (star) => (
+                        <Star
+                          key={star}
+                          size={8}
+                          className="fill-primary text-primary md:w-[10px] md:h-[10px]"
+                        />
+                      )
+                    )}
 
-                    {sizes.slice(0, 6).map((value: string) => (
-                      <span
-                        key={value}
-                        className="text-[8px] font-bold px-1.5 py-0.5 bg-foreground/5 rounded text-foreground/70 uppercase"
-                      >
-                        {value}
-                      </span>
-                    ))}
+                  </div>
 
-                    {sizes.length > 6 && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 text-foreground/40">
-                        +{sizes.length - 6}
+                  <div className="flex gap-1">
+
+                    {productColors
+                      .slice(0, 4)
+                      .map(
+                        (color: string) => (
+                          <div
+                            key={color}
+                            className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full border border-border shadow-sm"
+                            style={{
+                              backgroundColor:
+                                getColorHex(
+                                  color
+                                ),
+                            }}
+                            title={color}
+                          />
+                        )
+                      )}
+
+                    {productColors.length >
+                      4 && (
+                      <span className="text-[8px] font-bold text-muted-foreground">
+                        +
+                        {productColors.length -
+                          4}
                       </span>
                     )}
 
                   </div>
 
-                  <div className="h-px bg-border/50 w-full" />
-
-                  <span className="text-[9px] font-black uppercase tracking-widest text-foreground text-center">
-                    Voir les détails
-                  </span>
-
-                </div>
-              </div>
-
-            </Link>
-
-            {/* ==================================================
-                PRODUCT INFO
-            ================================================== */}
-
-            <div className="px-1">
-
-              <div className="flex items-center justify-between mb-1.5 md:mb-2">
-
-                {/* STARS */}
-
-                <div className="flex items-center gap-0.5 md:gap-1">
-
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={8}
-                      className="fill-primary text-primary md:w-[10px] md:h-[10px]"
-                    />
-                  ))}
-
                 </div>
 
-                {/* COLORS */}
+                <Link
+                  href={`/products/${product.handle}`}
+                  className="block"
+                >
 
-                <div className="flex gap-1">
+                  <h3 className="text-[11px] md:text-[13px] font-black uppercase tracking-tight truncate mb-0.5 md:mb-1 group-hover:text-primary transition-colors">
+                    {product.title}
+                  </h3>
 
-                  {productColors
+                </Link>
+
+                {/* MOBILE SIZES */}
+
+                <div className="flex flex-wrap gap-1 md:hidden mb-1">
+
+                  {sizes
                     .slice(0, 4)
-                    .map((color: string) => (
-                      <div
-                        key={color}
-                        className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full border border-border shadow-sm"
-                        style={{
-                          backgroundColor:
-                            getColorHex(color),
-                        }}
-                        title={color}
-                      />
-                    ))}
+                    .map(
+                      (size: string) => (
+                        <span
+                          key={size}
+                          className="text-[7px] font-bold text-muted-foreground"
+                        >
+                          {size}
+                        </span>
+                      )
+                    )}
 
-                  {productColors.length > 4 && (
-                    <span className="text-[8px] font-bold text-muted-foreground">
-                      +{productColors.length - 4}
+                  {sizes.length >
+                    4 && (
+                    <span className="text-[7px] font-bold text-muted-foreground">
+                      +
+                      {sizes.length -
+                        4}
+                    </span>
+                  )}
+
+                </div>
+
+                {/* PRICE */}
+
+                <div className="flex items-center gap-2">
+
+                  <p
+                    className="text-primary font-black text-sm md:text-lg"
+                    suppressHydrationWarning
+                  >
+                    {price}
+                  </p>
+
+                  {!available && (
+                    <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground line-through md:hidden">
+                      Épuisé
                     </span>
                   )}
 
@@ -1362,64 +1841,10 @@ function ProductGrid({
 
               </div>
 
-              {/* TITLE */}
-
-              <Link
-                href={`/products/${product.handle}`}
-                className="block"
-              >
-                <h3 className="text-[11px] md:text-[13px] font-black uppercase tracking-tight truncate mb-0.5 md:mb-1 group-hover:text-primary transition-colors">
-                  {product.title}
-                </h3>
-              </Link>
-
-              {/* MOBILE SIZES */}
-
-              <div className="flex flex-wrap gap-1 md:hidden mb-1">
-
-                {sizes
-                  .slice(0, 4)
-                  .map((size: string) => (
-                    <span
-                      key={size}
-                      className="text-[7px] font-bold text-muted-foreground"
-                    >
-                      {size}
-                    </span>
-                  ))}
-
-                {sizes.length > 4 && (
-                  <span className="text-[7px] font-bold text-muted-foreground">
-                    +{sizes.length - 4}
-                  </span>
-                )}
-
-              </div>
-
-              {/* PRICE */}
-
-              <div className="flex items-center gap-2">
-
-                <p
-                  className="text-primary font-black text-sm md:text-lg"
-                  suppressHydrationWarning
-                >
-                  {price}
-                </p>
-
-                {!available && (
-                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground line-through md:hidden">
-                    Épuisé
-                  </span>
-                )}
-
-              </div>
-
             </div>
-
-          </div>
-        );
-      })}
+          );
+        }
+      )}
 
     </div>
   );
