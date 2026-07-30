@@ -76,11 +76,18 @@ function getOption(options: any[], names: string[]) {
 }
 
 function getProductImage(product: any): string | null {
-  return (
+  const url =
     product?.images?.edges?.[0]?.node?.url ||
     product?.featuredImage?.url ||
-    null
-  );
+    null;
+
+  if (!url) {
+    return null;
+  }
+
+  // Shopify peut retourner une URL avec des paramètres.
+  // On la garde telle quelle : <img> peut la charger directement.
+  return String(url);
 }
 
 function getProductAlt(product: any): string {

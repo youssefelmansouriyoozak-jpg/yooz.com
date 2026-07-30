@@ -1,5 +1,52 @@
 // ============================================================
-// SHOPIFY API
+// SHOPIFY CONFIG
+// ============================================================
+
+const SHOPIFY_STORE_DOMAIN =
+  process.env.SHOPIFY_STORE_DOMAIN;
+
+const SHOPIFY_STOREFRONT_ACCESS_TOKEN =
+  process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+
+const SHOPIFY_ADMIN_ACCESS_TOKEN =
+  process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+
+const SHOPIFY_API_VERSION = '2024-04';
+
+
+// ============================================================
+// VALIDATION
+// ============================================================
+
+if (!SHOPIFY_STORE_DOMAIN) {
+  console.warn(
+    '⚠️ SHOPIFY_STORE_DOMAIN is missing'
+  );
+}
+
+if (!SHOPIFY_STOREFRONT_ACCESS_TOKEN) {
+  console.warn(
+    '⚠️ SHOPIFY_STOREFRONT_ACCESS_TOKEN is missing'
+  );
+}
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getStoreDomain() {
+  return SHOPIFY_STORE_DOMAIN?.replace(
+    /^https?:\/\//,
+    ''
+  ).replace(/\/$/,
+    ''
+  );
+}
+
+
+// ============================================================
+// STOREFRONT FETCH
 // ============================================================
 
 export const shopifyFetch = async ({
@@ -7,81 +54,115 @@ export const shopifyFetch = async ({
   variables = {},
 }: {
   query: string;
-  variables?: any;
+  variables?: Record<string, any>;
 }) => {
-  const domain = process.env.SHOPIFY_STORE_DOMAIN;
-  const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+  const domain = getStoreDomain();
 
   if (!domain) {
-    console.error("❌ SHOPIFY_STORE_DOMAIN est manquant");
     return {
       status: 500,
-      body: { error: "SHOPIFY_STORE_DOMAIN is missing" },
+      body: {
+        errors: [
+          {
+            message:
+              'SHOPIFY_STORE_DOMAIN is missing',
+          },
+        ],
+      },
     };
   }
 
-  if (!key) {
-    console.error("❌ SHOPIFY_STOREFRONT_ACCESS_TOKEN est manquant");
+  if (!SHOPIFY_STOREFRONT_ACCESS_TOKEN) {
     return {
       status: 500,
-      body: { error: "SHOPIFY_STOREFRONT_ACCESS_TOKEN is missing" },
+      body: {
+        errors: [
+          {
+            message:
+              'SHOPIFY_STOREFRONT_ACCESS_TOKEN is missing',
+          },
+        ],
+      },
     };
   }
 
-  const endpoint = `https://${domain}/api/2024-04/graphql.json`;
+  const endpoint =
+    `https://${domain}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
   try {
-    const result = await fetch(endpoint, {
-      method: "POST",
+    const response = await fetch(
+      endpoint,
+      {
+        method: 'POST',
 
-      headers: {
-        "Content-Type": "application/json",
-        "X-Shopify-Storefront-Access-Token": key,
-      },
+        headers: {
+          'Content-Type':
+            'application/json',
 
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
+          'X-Shopify-Storefront-Access-Token':
+            SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+        },
 
-      cache: "no-store",
-    });
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
 
-    const body = await result.json();
+        cache: 'no-store',
+      }
+    );
 
-    if (!result.ok) {
+    const body =
+      await response.json();
+
+    if (!response.ok) {
       console.error(
-        "❌ Shopify HTTP Error:",
-        result.status,
-        JSON.stringify(body, null, 2)
+        '❌ Shopify Storefront HTTP Error:',
+        response.status,
+        body
       );
     }
 
-    if (body.errors) {
+    if (body?.errors) {
       console.error(
-        "❌ Shopify GraphQL Errors:",
-        JSON.stringify(body.errors, null, 2)
+        '❌ Shopify Storefront GraphQL Errors:',
+        JSON.stringify(
+          body.errors,
+          null,
+          2
+        )
       );
     }
 
     return {
-      status: result.status,
+      status: response.status,
       body,
     };
   } catch (error) {
-    console.error("❌ Error fetching from Shopify:", error);
+    console.error(
+      '❌ Shopify Storefront Fetch Error:',
+      error
+    );
 
     return {
       status: 500,
       body: {
-        error: error instanceof Error ? error.message : "Unknown error",
+        errors: [
+          {
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Unknown error',
+          },
+        ],
       },
     };
   }
 };
 
+
 // ============================================================
-// SHOPIFY ADMIN API
+// ADMIN FETCH
 // ============================================================
 
 export const adminFetch = async ({
@@ -89,88 +170,122 @@ export const adminFetch = async ({
   variables = {},
 }: {
   query: string;
-  variables?: any;
+  variables?: Record<string, any>;
 }) => {
-  const domain = process.env.SHOPIFY_STORE_DOMAIN;
-  const key = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+  const domain = getStoreDomain();
 
   if (!domain) {
-    console.error("❌ SHOPIFY_STORE_DOMAIN est manquant");
     return {
       status: 500,
-      body: { error: "SHOPIFY_STORE_DOMAIN is missing" },
+      body: {
+        errors: [
+          {
+            message:
+              'SHOPIFY_STORE_DOMAIN is missing',
+          },
+        ],
+      },
     };
   }
 
-  if (!key) {
-    console.error("❌ SHOPIFY_ADMIN_ACCESS_TOKEN est manquant");
+  if (!SHOPIFY_ADMIN_ACCESS_TOKEN) {
     return {
       status: 500,
-      body: { error: "SHOPIFY_ADMIN_ACCESS_TOKEN is missing" },
+      body: {
+        errors: [
+          {
+            message:
+              'SHOPIFY_ADMIN_ACCESS_TOKEN is missing',
+          },
+        ],
+      },
     };
   }
 
-  const endpoint = `https://${domain}/admin/api/2024-04/graphql.json`;
+  const endpoint =
+    `https://${domain}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
   try {
-    const result = await fetch(endpoint, {
-      method: "POST",
+    const response = await fetch(
+      endpoint,
+      {
+        method: 'POST',
 
-      headers: {
-        "Content-Type": "application/json",
-        "X-Shopify-Access-Token": key,
-      },
+        headers: {
+          'Content-Type':
+            'application/json',
 
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
+          'X-Shopify-Access-Token':
+            SHOPIFY_ADMIN_ACCESS_TOKEN,
+        },
 
-      cache: "no-store",
-    });
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
 
-    const body = await result.json();
+        cache: 'no-store',
+      }
+    );
 
-    if (!result.ok) {
+    const body =
+      await response.json();
+
+    if (!response.ok) {
       console.error(
-        "❌ Shopify Admin HTTP Error:",
-        result.status,
-        JSON.stringify(body, null, 2)
+        '❌ Shopify Admin HTTP Error:',
+        response.status,
+        body
       );
     }
 
-    if (body.errors) {
+    if (body?.errors) {
       console.error(
-        "❌ Shopify Admin GraphQL Errors:",
-        JSON.stringify(body.errors, null, 2)
+        '❌ Shopify Admin GraphQL Errors:',
+        JSON.stringify(
+          body.errors,
+          null,
+          2
+        )
       );
     }
 
     return {
-      status: result.status,
+      status: response.status,
       body,
     };
   } catch (error) {
-    console.error("❌ Error fetching from Shopify Admin:", error);
+    console.error(
+      '❌ Shopify Admin Fetch Error:',
+      error
+    );
 
     return {
       status: 500,
       body: {
-        error: error instanceof Error ? error.message : "Unknown error",
+        errors: [
+          {
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Unknown error',
+          },
+        ],
       },
     };
   }
 };
 
+
 // ============================================================
-// GET PRODUCTS
+// PRODUCTS
 // ============================================================
 
 export const getProducts = async () => {
   const query = `
     query getProducts {
       products(
-        first: 10
+        first: 50
         sortKey: CREATED
         reverse: true
       ) {
@@ -198,6 +313,16 @@ export const getProducts = async () => {
                     name
                     value
                   }
+
+                  price {
+                    amount
+                    currencyCode
+                  }
+
+                  compareAtPrice {
+                    amount
+                    currencyCode
+                  }
                 }
               }
             }
@@ -207,15 +332,18 @@ export const getProducts = async () => {
                 amount
                 currencyCode
               }
+
+              maxVariantPrice {
+                amount
+                currencyCode
+              }
             }
 
-            images(first: 5) {
+            images(first: 10) {
               edges {
                 node {
                   url
                   altText
-                  width
-                  height
                 }
               }
             }
@@ -225,30 +353,33 @@ export const getProducts = async () => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query,
-  });
+  const res =
+    await shopifyFetch({
+      query,
+    });
 
-  if (res.status !== 200) {
-    return [];
-  }
-
-  return res.body?.data?.products?.edges || [];
+  return (
+    res.body?.data?.products?.edges ||
+    []
+  );
 };
 
+
 // ============================================================
-// GET SINGLE PRODUCT
+// SINGLE PRODUCT
 // ============================================================
 
-export const getProduct = async (handle: string) => {
+export const getProduct = async (
+  handle: string
+) => {
   const query = `
     query getProduct($handle: String!) {
       product(handle: $handle) {
         id
         title
+        handle
         description
         descriptionHtml
-        handle
         productType
 
         options {
@@ -261,6 +392,11 @@ export const getProduct = async (handle: string) => {
             amount
             currencyCode
           }
+
+          maxVariantPrice {
+            amount
+            currencyCode
+          }
         }
 
         compareAtPriceRange {
@@ -268,15 +404,18 @@ export const getProduct = async (handle: string) => {
             amount
             currencyCode
           }
+
+          maxVariantPrice {
+            amount
+            currencyCode
+          }
         }
 
-        images(first: 10) {
+        images(first: 20) {
           edges {
             node {
               url
               altText
-              width
-              height
             }
           }
         }
@@ -309,25 +448,37 @@ export const getProduct = async (handle: string) => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query,
-    variables: {
-      handle,
-    },
-  });
+  const res =
+    await shopifyFetch({
+      query,
+      variables: {
+        handle,
+      },
+    });
 
-  return res.body?.data?.product || null;
+  return (
+    res.body?.data?.product ||
+    null
+  );
 };
 
+
 // ============================================================
-// GET COLLECTION PRODUCTS
+// COLLECTION PRODUCTS
 // ============================================================
 
-export const getCollectionProducts = async (handle: string) => {
+export const getCollectionProducts = async (
+  handle: string
+) => {
   const query = `
-    query getCollectionProducts($handle: String!) {
+    query getCollectionProducts(
+      $handle: String!
+    ) {
       collection(handle: $handle) {
+        id
         title
+        handle
+        description
 
         products(
           first: 250
@@ -351,15 +502,32 @@ export const getCollectionProducts = async (handle: string) => {
                   amount
                   currencyCode
                 }
+
+                maxVariantPrice {
+                  amount
+                  currencyCode
+                }
               }
 
-              images(first: 5) {
+              images(first: 10) {
                 edges {
                   node {
                     url
                     altText
-                    width
-                    height
+                  }
+                }
+              }
+
+              variants(first: 100) {
+                edges {
+                  node {
+                    id
+                    availableForSale
+
+                    selectedOptions {
+                      name
+                      value
+                    }
                   }
                 }
               }
@@ -370,18 +538,23 @@ export const getCollectionProducts = async (handle: string) => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query,
-    variables: {
-      handle,
-    },
-  });
+  const res =
+    await shopifyFetch({
+      query,
+      variables: {
+        handle,
+      },
+    });
 
-  return res.body?.data?.collection || null;
+  return (
+    res.body?.data?.collection ||
+    null
+  );
 };
 
+
 // ============================================================
-// GET COLLECTIONS
+// COLLECTIONS
 // ============================================================
 
 export const getCollections = async () => {
@@ -398,8 +571,6 @@ export const getCollections = async () => {
             image {
               url
               altText
-              width
-              height
             }
           }
         }
@@ -407,15 +578,20 @@ export const getCollections = async () => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query,
-  });
+  const res =
+    await shopifyFetch({
+      query,
+    });
 
-  return res.body?.data?.collections?.edges || [];
+  return (
+    res.body?.data?.collections?.edges ||
+    []
+  );
 };
 
+
 // ============================================================
-// GET ALL PRODUCTS
+// ALL PRODUCTS
 // ============================================================
 
 export const getAllProducts = async () => {
@@ -443,15 +619,38 @@ export const getAllProducts = async () => {
                 amount
                 currencyCode
               }
+
+              maxVariantPrice {
+                amount
+                currencyCode
+              }
             }
 
-            images(first: 5) {
+            images(first: 10) {
               edges {
                 node {
                   url
                   altText
-                  width
-                  height
+                }
+              }
+            }
+
+            variants(first: 100) {
+              edges {
+                node {
+                  id
+                  title
+                  availableForSale
+
+                  selectedOptions {
+                    name
+                    value
+                  }
+
+                  price {
+                    amount
+                    currencyCode
+                  }
                 }
               }
             }
@@ -461,34 +660,25 @@ export const getAllProducts = async () => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query,
-  });
+  const res =
+    await shopifyFetch({
+      query,
+    });
 
-  if (res.status !== 200) {
-    console.error("❌ Impossible de récupérer les produits Shopify");
-    return [];
-  }
-
-  const products = res.body?.data?.products?.edges || [];
-
-  // Debug utile en production
-  console.log(
-    "✅ Shopify products:",
-    products.map((edge: any) => ({
-      title: edge.node.title,
-      image: edge.node.images?.edges?.[0]?.node?.url || null,
-    }))
+  return (
+    res.body?.data?.products?.edges ||
+    []
   );
-
-  return products;
 };
+
 
 // ============================================================
 // CREATE COD ORDER
 // ============================================================
 
-export const createCodOrder = async (orderData: any) => {
+export const createCodOrder = async (
+  orderData: any
+) => {
   const {
     firstName,
     lastName,
@@ -499,15 +689,57 @@ export const createCodOrder = async (orderData: any) => {
     items,
   } = orderData;
 
-  const sanitizedPhone = phone.replace(/\s/g, "");
+  const sanitizedPhone =
+    String(phone || '')
+      .replace(/\s/g, '');
 
   const email =
-    providedEmail && providedEmail.trim() !== ""
-      ? providedEmail.trim()
+    providedEmail &&
+    String(providedEmail).trim() !== ''
+      ? String(providedEmail).trim()
       : null;
 
+  if (!firstName || !lastName) {
+    return {
+      draftOrder: null,
+      userErrors: [
+        {
+          message:
+            'Prénom et nom obligatoires',
+        },
+      ],
+    };
+  }
+
+  if (!sanitizedPhone) {
+    return {
+      draftOrder: null,
+      userErrors: [
+        {
+          message:
+            'Téléphone obligatoire',
+        },
+      ],
+    };
+  }
+
+  if (
+    !Array.isArray(items) ||
+    items.length === 0
+  ) {
+    return {
+      draftOrder: null,
+      userErrors: [
+        {
+          message:
+            'Le panier est vide',
+        },
+      ],
+    };
+  }
+
   // ----------------------------------------------------------
-  // FIND / CREATE CUSTOMER
+  // CUSTOMER
   // ----------------------------------------------------------
 
   let customerId = null;
@@ -516,49 +748,48 @@ export const createCodOrder = async (orderData: any) => {
     ? `phone:${sanitizedPhone} OR email:${email}`
     : `phone:${sanitizedPhone}`;
 
-  const searchRes = await adminFetch({
-    query: `
-      query {
-        customers(
-          first: 1
-          query: "${searchQuery}"
+  const searchRes =
+    await adminFetch({
+      query: `
+        query SearchCustomer(
+          $query: String!
         ) {
-          edges {
-            node {
-              id
+          customers(
+            first: 1
+            query: $query
+          ) {
+            edges {
+              node {
+                id
+              }
             }
           }
         }
-      }
-    `,
-  });
+      `,
+      variables: {
+        query: searchQuery,
+      },
+    });
 
-  if (searchRes.body?.data?.customers?.edges?.length > 0) {
+  if (
+    searchRes.body?.data?.customers
+      ?.edges?.length > 0
+  ) {
     customerId =
-      searchRes.body.data.customers.edges[0].node.id;
+      searchRes.body.data.customers
+        .edges[0].node.id;
   } else {
-    const customerMutation = `
-      mutation customerCreate($input: CustomerInput!) {
-        customerCreate(input: $input) {
-          customer {
-            id
-          }
-
-          userErrors {
-            field
-            message
-          }
-        }
-      }
-    `;
-
     const customerInput: any = {
       firstName,
       lastName,
 
-      phone: sanitizedPhone.startsWith("+")
-        ? sanitizedPhone
-        : `+212${sanitizedPhone.replace(/^0/, "")}`,
+      phone:
+        sanitizedPhone.startsWith('+')
+          ? sanitizedPhone
+          : `+212${sanitizedPhone.replace(
+              /^0/,
+              ''
+            )}`,
 
       addresses: [
         {
@@ -566,7 +797,7 @@ export const createCodOrder = async (orderData: any) => {
           lastName,
           address1: address,
           city,
-          countryCode: "MA",
+          countryCode: 'MA',
           phone: sanitizedPhone,
         },
       ],
@@ -576,25 +807,83 @@ export const createCodOrder = async (orderData: any) => {
       customerInput.email = email;
     }
 
-    const customerRes = await adminFetch({
-      query: customerMutation,
-      variables: {
-        input: customerInput,
-      },
-    });
+    const customerRes =
+      await adminFetch({
+        query: `
+          mutation customerCreate(
+            $input: CustomerInput!
+          ) {
+            customerCreate(
+              input: $input
+            ) {
+              customer {
+                id
+              }
+
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `,
+
+        variables: {
+          input: customerInput,
+        },
+      });
 
     customerId =
-      customerRes.body?.data?.customerCreate?.customer?.id;
+      customerRes.body?.data
+        ?.customerCreate
+        ?.customer
+        ?.id;
+
+    if (!customerId) {
+      return {
+        draftOrder: null,
+        userErrors:
+          customerRes.body?.data
+            ?.customerCreate
+            ?.userErrors ||
+          [
+            {
+              message:
+                'Impossible de créer le client Shopify',
+            },
+          ],
+      };
+    }
   }
 
   // ----------------------------------------------------------
   // LINE ITEMS
   // ----------------------------------------------------------
 
-  const lineItems = items.map((item: any) => ({
-    variantId: item.variantId,
-    quantity: item.quantity,
-  }));
+  const lineItems = items
+    .map((item: any) => ({
+      variantId: item.variantId,
+      quantity: Number(
+        item.quantity || 1
+      ),
+    }))
+    .filter(
+      (item: any) =>
+        item.variantId &&
+        item.quantity > 0
+    );
+
+  if (lineItems.length === 0) {
+    return {
+      draftOrder: null,
+      userErrors: [
+        {
+          message:
+            'Aucun article valide dans le panier',
+        },
+      ],
+    };
+  }
 
   // ----------------------------------------------------------
   // ADDRESS
@@ -606,52 +895,41 @@ export const createCodOrder = async (orderData: any) => {
     phone: sanitizedPhone,
     city,
     address1: address,
-    countryCode: "MA",
-    zip: "00000",
+    countryCode: 'MA',
+    zip: '00000',
   };
 
   // ----------------------------------------------------------
-  // CREATE DRAFT ORDER
+  // DRAFT ORDER
   // ----------------------------------------------------------
-
-  const createMutation = `
-    mutation draftOrderCreate($input: DraftOrderInput!) {
-      draftOrderCreate(input: $input) {
-        draftOrder {
-          id
-        }
-
-        userErrors {
-          field
-          message
-        }
-      }
-    }
-  `;
 
   const draftOrderInput: any = {
     customerId,
 
-    note: `COMMANDE COD - Tél: ${phone} - ${firstName} ${lastName}`,
+    note:
+      `COMMANDE COD - Tél: ${phone} - ${firstName} ${lastName}`,
 
-    shippingAddress: addressInput,
-    billingAddress: addressInput,
+    shippingAddress:
+      addressInput,
+
+    billingAddress:
+      addressInput,
 
     lineItems,
 
     shippingLine: {
-      title: "Livraison Gratuite",
+      title: 'Livraison Gratuite',
       price: 0,
     },
 
     customAttributes: [
       {
-        key: "Payment Method",
-        value: "COD",
+        key: 'Payment Method',
+        value: 'COD',
       },
       {
-        key: "Customer Phone",
-        value: phone,
+        key: 'Customer Phone',
+        value: String(phone),
       },
     ],
   };
@@ -660,79 +938,115 @@ export const createCodOrder = async (orderData: any) => {
     draftOrderInput.email = email;
   }
 
-  const createRes = await adminFetch({
-    query: createMutation,
-    variables: {
-      input: draftOrderInput,
-    },
-  });
+  const createRes =
+    await adminFetch({
+      query: `
+        mutation draftOrderCreate(
+          $input: DraftOrderInput!
+        ) {
+          draftOrderCreate(
+            input: $input
+          ) {
+            draftOrder {
+              id
+            }
 
-  const draftOrderId =
-    createRes.body?.data?.draftOrderCreate?.draftOrder?.id;
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `,
 
-  if (!draftOrderId) {
+      variables: {
+        input: draftOrderInput,
+      },
+    });
+
+  const draftOrder =
+    createRes.body?.data
+      ?.draftOrderCreate
+      ?.draftOrder;
+
+  if (!draftOrder?.id) {
     return {
       draftOrder: null,
-
       userErrors:
-        createRes.body?.data?.draftOrderCreate?.userErrors || [],
+        createRes.body?.data
+          ?.draftOrderCreate
+          ?.userErrors ||
+        [
+          {
+            message:
+              'Impossible de créer la commande',
+          },
+        ],
     };
   }
 
   // ----------------------------------------------------------
-  // COMPLETE DRAFT ORDER
+  // COMPLETE
   // ----------------------------------------------------------
 
-  const completeMutation = `
-    mutation draftOrderComplete(
-      $id: ID!
-      $paymentPending: Boolean
-    ) {
-      draftOrderComplete(
-        id: $id
-        paymentPending: $paymentPending
-      ) {
-        draftOrder {
-          id
+  const completeRes =
+    await adminFetch({
+      query: `
+        mutation draftOrderComplete(
+          $id: ID!
+          $paymentPending: Boolean
+        ) {
+          draftOrderComplete(
+            id: $id
+            paymentPending: $paymentPending
+          ) {
+            draftOrder {
+              id
 
-          order {
-            id
-            name
-            displayFinancialStatus
+              order {
+                id
+                name
+                displayFinancialStatus
+              }
+            }
+
+            userErrors {
+              field
+              message
+            }
           }
         }
+      `,
 
-        userErrors {
-          field
-          message
-        }
-      }
-    }
-  `;
-
-  const completeRes = await adminFetch({
-    query: completeMutation,
-
-    variables: {
-      id: draftOrderId,
-      paymentPending: true,
-    },
-  });
+      variables: {
+        id: draftOrder.id,
+        paymentPending: true,
+      },
+    });
 
   return {
     draftOrder:
-      completeRes.body?.data?.draftOrderComplete?.draftOrder,
+      completeRes.body?.data
+        ?.draftOrderComplete
+        ?.draftOrder ||
+      null,
 
     userErrors:
-      completeRes.body?.data?.draftOrderComplete?.userErrors || [],
+      completeRes.body?.data
+        ?.draftOrderComplete
+        ?.userErrors ||
+      [],
   };
 };
 
+
 // ============================================================
-// CREATE CUSTOMER
+// CUSTOMER CREATE
 // ============================================================
 
-export const createCustomer = async (input: any) => {
+export const createCustomer = async (
+  input: any
+) => {
   const mutation = `
     mutation customerCreate(
       $input: CustomerCreateInput!
@@ -754,55 +1068,73 @@ export const createCustomer = async (input: any) => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query: mutation,
-    variables: {
-      input,
-    },
-  });
+  const res =
+    await shopifyFetch({
+      query: mutation,
+      variables: {
+        input,
+      },
+    });
 
-  return res.body?.data?.customerCreate;
+  return (
+    res.body?.data?.customerCreate ||
+    null
+  );
 };
 
+
 // ============================================================
-// CREATE CUSTOMER ACCESS TOKEN
+// CUSTOMER LOGIN
 // ============================================================
 
-export const createCustomerAccessToken = async (input: any) => {
-  const mutation = `
-    mutation customerAccessTokenCreate(
-      $input: CustomerAccessTokenCreateInput!
-    ) {
-      customerAccessTokenCreate(input: $input) {
-        customerAccessToken {
-          accessToken
-          expiresAt
-        }
+export const createCustomerAccessToken =
+  async (
+    input: any
+  ) => {
+    const mutation = `
+      mutation customerAccessTokenCreate(
+        $input: CustomerAccessTokenCreateInput!
+      ) {
+        customerAccessTokenCreate(
+          input: $input
+        ) {
+          customerAccessToken {
+            accessToken
+            expiresAt
+          }
 
-        customerUserErrors {
-          field
-          message
-          code
+          customerUserErrors {
+            field
+            message
+            code
+          }
         }
       }
-    }
-  `;
+    `;
 
-  const res = await shopifyFetch({
-    query: mutation,
-    variables: {
-      input,
-    },
-  });
+    const res =
+      await shopifyFetch({
+        query: mutation,
+        variables: {
+          input,
+        },
+      });
 
-  return res.body?.data?.customerAccessTokenCreate;
-};
+    return (
+      res.body?.data
+        ?.customerAccessTokenCreate ||
+      null
+    );
+  };
+
 
 // ============================================================
-// GET CUSTOMER
+// CUSTOMER
 // ============================================================
 
-export const getCustomer = async (accessToken: string) => {
+export const getCustomer = async (
+  accessToken: string
+) => {
   const query = `
     query getCustomer(
       $customerAccessToken: String!
@@ -834,43 +1166,54 @@ export const getCustomer = async (accessToken: string) => {
     }
   `;
 
-  const res = await shopifyFetch({
-    query,
+  const res =
+    await shopifyFetch({
+      query,
+      variables: {
+        customerAccessToken:
+          accessToken,
+      },
+    });
 
-    variables: {
-      customerAccessToken: accessToken,
-    },
-  });
-
-  return res.body?.data?.customer || null;
+  return (
+    res.body?.data?.customer ||
+    null
+  );
 };
 
+
 // ============================================================
-// GET ALL CUSTOMERS
+// ADMIN CUSTOMERS
 // ============================================================
 
-export const getAllCustomers = async () => {
-  const query = `
-    query getAllCustomers {
-      customers(first: 50) {
-        edges {
-          node {
-            id
-            firstName
-            lastName
-            email
-            phone
-            ordersCount
-            totalSpent
+export const getAllCustomers =
+  async () => {
+    const query = `
+      query getAllCustomers {
+        customers(first: 50) {
+          edges {
+            node {
+              id
+              firstName
+              lastName
+              email
+              phone
+              ordersCount
+              totalSpent
+            }
           }
         }
       }
-    }
-  `;
+    `;
 
-  const res = await adminFetch({
-    query,
-  });
+    const res =
+      await adminFetch({
+        query,
+      });
 
-  return res.body?.data?.customers?.edges || [];
-};
+    return (
+      res.body?.data
+        ?.customers?.edges ||
+      []
+    );
+  };
